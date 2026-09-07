@@ -12,8 +12,9 @@ const ADMIN_PASSWORD = "moja-taina-parola";
 
 // Казваме на сървъра да показва HTML файла
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
+    res.sendFile(path.resolve(__dirname, 'index.html'));
 });
+
 
 // Логика за комуникация в реално време
 io.on('connection', (socket) => {
