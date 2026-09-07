@@ -39,9 +39,13 @@
 
     <div id="chat-screen" class="hidden">
         <div class="chat-bar">
-            <span>🔮 Amore VIP Chat</span>
-            <span id="user-badge" style="font-size:12px; background:rgba(168,85,247,0.2); padding:4px 10px; border-radius:12px;"></span>
-        </div>
+    <span>🔮 Amore VIP Chat</span>
+    <div style="display: flex; align-items: center; gap: 10px;">
+        <span id="user-badge" style="font-size:12px; background:rgba(168,85,247,0.2); padding:4px 10px; border-radius:12px;"></span>
+        <button onclick="location.reload()" style="width: auto; padding: 5px 12px; background: #ef4444; font-size: 11px; border-radius: 8px;">Изход</button>
+    </div>
+</div>
+
         <div id="messages-container"></div>
         <div class="input-bar">
             <input id="message-input" type="text" placeholder="Напиши съобщение..." style="margin:0; flex:1;">
