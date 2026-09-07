@@ -5,6 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Amore Club</title>
     <style>
+        /* 🪩 ДИСКОТЕЧНИ СВЕТЛИНИ (Градиентна анимация в реално време) */
+        @keyframes discoLights {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .disco-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(90deg, #9333ea, #ec4899, #3b82f6, #06b6d4, #9333ea);
+            background-size: 400% 400%;
+            animation: discoLights 4s linear infinite;
+            box-shadow: 0 0 20px #ec4899, 0 0 40px #9333ea;
+            z-index: 999;
+        }
+
         body { background: linear-gradient(135deg, #020617, #3b0764, #020617); min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: sans-serif; color: #f8fafc; margin: 0; padding: 20px; box-sizing: border-box; }
         .box { background: rgba(15, 23, 42, 0.9); padding: 30px; border-radius: 24px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); width: 100%; max-width: 400px; border: 1px solid rgba(168, 85, 247, 0.2); text-align: center; }
         h2 { font-size: 2rem; margin: 0 0 10px 0; background: linear-gradient(to right, #c084fc, #db2777); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
@@ -24,6 +43,8 @@
     <script src="/socket.io/socket.io.js"></script>
 </head>
 <body>
+    <!-- Лентата със светлините -->
+    <div class="disco-bar"></div>
     <!-- ЕКРАН ЗА ВХОД И РЕГИСТРАЦИЯ -->
     <div id="auth-screen" class="box">
         <h2 id="auth-title">Amore Club</h2>
