@@ -1,13 +1,92 @@
-{
-  "name": "mojat-chat",
-  "version": "1.0.0",
-  "description": "Без база данни чат",
-  "main": "server.js",
-  "scripts": {
-    "start": "node server.js"
-  },
-  "dependencies": {
-    "express": "^4.19.2",
-    "socket.io": "^4.7.5"
-  }
-}
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amore Chat</title>
+    <script src="https://jsdelivr.net"></script>
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<body class="bg-slate-100 h-screen flex flex-col items-center justify-center p-4">
+
+    <div id="login-screen" class="bg-white p-6 rounded-2xl shadow-xl w-full max-w-md text-center">
+        <h2 class="text-2xl font-bold mb-4 text-slate-800">Вход в Amore Chat</h2>
+        <input id="username-input" type="text" placeholder="Вашето име..." class="w-full p-3 border rounded-xl mb-3 focus:outline-blue-500">
+        <input id="password-input" type="password" placeholder="Парола (Само за админ)..." class="w-full p-3 border rounded-xl mb-4 focus:outline-blue-500">
+        <button onclick="joinChat()" class="w-full bg-blue-600 text-white p-3 rounded-xl font-semibold hover:bg-blue-700 transition">Влез</button>
+    </div>
+
+    <div id="chat-screen" class="hidden bg-white rounded-2xl shadow-xl w-full max-w-2xl h-[80vh] flex flex-col overflow-hidden">
+        <div class="bg-blue-600 text-white p-4 font-bold flex justify-between items-center">
+            <span>💬 Amore Chat Room</span>
+            <span id="my-name" class="text-sm bg-blue-700 px-3 py-1 rounded-full"></span>
+        </div>
+        <div id="messages-container" class="flex-1 p-4 overflow-y-auto space-y-3 flex flex-col bg-slate-50"></div>
+        <div class="p-3 border-t bg-white flex gap-2">
+            <input id="message-input" type="text" placeholder="Напишете съобщение..." class="flex-1 p-3 border rounded-xl focus:outline-blue-500" onkeypress="handleKeyPress(event)">
+            <button onclick="sendMessage()" class="bg-blue-600 text-white px-6 rounded-xl font-semibold hover:bg-blue-700">Изпрати</button>
+        </div>
+    </div>
+
+    <script>
+        const socket = io();
+        let myCurrentName = "";
+
+        function joinChat() {
+            const name = document.getElementById('username-input').value.trim();
+            const pass = document.getElementById('password-input').value;
+            if(!name) return alert("Моля, въведете име!");
+
+            myCurrentName = name;
+            document.getElementById('my-name').innerText = name;
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('chat-screen').classList.remove('hidden');
+
+            socket.emit('join', name, pass);
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('message-input');
+            const msg = input.value.trim();
+            if(!msg) return;
+
+            socket.emit('chat-message', msg);
+            input.value = "";
+        }
+
+        function handleKeyPress(e) {
+            if(e.key === 'Enter') sendMessage();
+        }
+
+        socket.on('broadcast-message', (data) => {
+            const container = document.getElementById('messages-container');
+            const msgDiv = document.createElement('div');
+            const isMe = data.user === myCurrentName;
+            
+            msgDiv.className = `max-w-[70%] p-3 rounded-2xl text-sm ${
+                isMe ? 'bg-blue-500 text-white self-end rounded-tr-none' : 'bg-slate-200 text-slate-800 self-start rounded-tl-none'
+            } ${data.isAdmin ? 'border-2 border-red-500 font-bold' : ''}`;
+
+            msgDiv.innerHTML = `<span class="block text-xs opacity-75 font-semibold">${data.user}</span>${data.text}`;
+            container.appendChild(msgDiv);
+            container.scrollTop = container.scrollHeight;
+        });
+
+        socket.on('system-message', (text) => {
+            const container = document.getElementById('messages-container');
+            const sysDiv = document.createElement('div');
+            sysDiv.className = "text-center text-xs text-slate-400 my-1 italic";
+            sysDiv.innerText = text;
+            container.appendChild(sysDiv);
+            container.scrollTop = container.scrollHeight;
+        });
+
+        socket.on('kick-user', (targetName) => {
+            if(myCurrentName === targetName) {
+                alert("Бяхте изгонен от администратора!");
+                location.reload();
+            }
+        });
+    </script>
+</body>
+</html>
