@@ -9,7 +9,6 @@ const io = new Server(server);
 
 const ADMIN_PASSWORD = "moja-taina-parola";
 
-// ⚠️ ПРИНУДИТЕЛНО ЗАРЕЖДАНЕ НА ДИЗАЙНА НА НАЧАЛНА СТРАНИЦА
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
