@@ -6,9 +6,9 @@
     <title>Amore Club</title>
     <style>
         body { background: linear-gradient(135deg, #020617, #3b0764, #020617); min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: sans-serif; color: #f8fafc; margin: 0; padding: 20px; box-sizing: border-box; }
-        .box { background: rgba(15, 23, 42, 0.9); padding: 30px; rounded-radius: 24px; border-radius: 24px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); width: 100%; max-width: 400px; border: 1px solid rgba(168, 85, 247, 0.2); text-align: center; }
+        .box { background: rgba(15, 23, 42, 0.9); padding: 30px; border-radius: 24px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); width: 100%; max-width: 400px; border: 1px solid rgba(168, 85, 247, 0.2); text-align: center; }
         h2 { font-size: 2rem; margin: 0 0 10px 0; background: linear-gradient(to right, #c084fc, #db2777); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        input, select, textarea { w-full; width: 100%; padding: 12px; background: rgba(30, 41, 59, 0.5); border: 1px solid #334155; border-radius: 12px; color: white; margin-bottom: 12px; box-sizing: border-box; }
+        input, select, textarea { width: 100%; padding: 12px; background: rgba(30, 41, 59, 0.5); border: 1px solid #334155; border-radius: 12px; color: white; margin-bottom: 12px; box-sizing: border-box; }
         input:focus { border-color: #a855f7; outline: none; }
         button { width: 100%; padding: 14px; background: linear-gradient(to right, #9333ea, #db2777); border: none; border-radius: 12px; color: white; font-weight: bold; cursor: pointer; font-size: 1rem; }
         button:hover { opacity: 0.9; }
@@ -21,7 +21,6 @@
     <script src="/socket.io/socket.io.js"></script>
 </head>
 <body>
-
     <div id="auth-screen" class="box">
         <h2 id="auth-title">Amore Club</h2>
         <p style="color:#94a3b8; font-size:12px; margin-bottom:20px;">Влез или се регистрирай в тайния чат</p>
@@ -36,9 +35,9 @@
             </select>
             <textarea id="info-input" placeholder="За мен..."></textarea>
         </div>
-        <button onclick="handleAuth()" id="main-auth-btn">Влизане</button>
+        <button onclick="window.handleAuth()" id="main-auth-btn">Влизане</button>
         <p style="font-size:12px; color:#94a3b8; margin-top:15px;">
-            <span id="switch-text">Нямаш профил?</span> <button onclick="toggleAuthMode()" id="switch-btn" style="background:none; border:none; color:#c084fc; width:auto; padding:0; display:inline; cursor:pointer; font-weight:bold;">Регистрирай се</button>
+            <span id="switch-text">Нямаш профил?</span> <button onclick="window.toggleAuthMode()" id="switch-btn" style="background:none; border:none; color:#c084fc; width:auto; padding:0; display:inline; cursor:pointer; font-weight:bold;">Регистрирай се</button>
         </p>
     </div>
 
@@ -50,10 +49,9 @@
         <div id="messages-container"></div>
         <div class="input-bar">
             <input id="message-input" type="text" placeholder="Напиши съобщение..." style="margin:0; flex:1;">
-            <button onclick="sendMessage()" style="width:auto; padding:0 25px;">Прати</button>
+            <button onclick="window.sendMessage()" style="width:auto; padding:0 25px;">Прати</button>
         </div>
-    </div>
-
+    </div>    <!-- Свързване на Firebase директно през браузъра (v9 модулна версия) -->
     <script type="module">
         import { initializeApp } from "https://gstatic.com";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://gstatic.com";
