@@ -3,42 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Amore Chat</title>
+    <title>Amore Chat | Premium</title>
+    <!-- Правилно свързване на Tailwind CSS за брутален дизайн -->
     <script src="https://jsdelivr.net"></script>
-    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://socket.io"></script>
 </head>
-<body class="bg-slate-100 h-screen flex flex-col items-center justify-center p-4">
+<body class="bg-gradient-to-br from-slate-900 via-purple-950 to-slate-900 h-screen flex flex-col items-center justify-center p-4 font-sans text-slate-100">
 
-    <div id="login-screen" class="bg-white p-6 rounded-2xl shadow-xl w-full max-w-md text-center">
-        <h2 class="text-2xl font-bold mb-4 text-slate-800">Вход в Amore Chat</h2>
-        <input id="username-input" type="text" placeholder="Вашето име..." class="w-full p-3 border rounded-xl mb-3 focus:outline-blue-500">
-        <input id="password-input" type="password" placeholder="Парола (Само за админ)..." class="w-full p-3 border rounded-xl mb-4 focus:outline-blue-500">
-        <button onclick="joinChat()" class="w-full bg-blue-600 text-white p-3 rounded-xl font-semibold hover:bg-blue-700 transition">Влез</button>
+    <!-- ЕКРАН ЗА ВХОД -->
+    <div id="login-screen" class="bg-slate-900/80 backdrop-blur-md p-8 rounded-3xl shadow-2xl w-full max-w-md text-center border border-purple-500/20 transform transition duration-500 hover:scale-105">
+        <div class="text-5xl mb-4 animate-bounce">🔮</div>
+        <h2 class="text-3xl font-extrabold mb-2 bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">Amore Chat</h2>
+        <p class="text-xs text-slate-400 mb-6">Влез в тайното място за разговори</p>
+        
+        <input id="username-input" type="text" placeholder="Твоето готино име..." class="w-full p-4 bg-slate-800/50 border border-slate-700 rounded-2xl mb-3 focus:outline-none focus:border-purple-500 text-white placeholder-slate-500 transition">
+        <input id="password-input" type="password" placeholder="Админ парола (ако си шеф)..." class="w-full p-4 bg-slate-800/50 border border-slate-700 rounded-2xl mb-6 focus:outline-none focus:border-purple-500 text-white placeholder-slate-500 transition">
+        
+        <button onclick="joinChat()" class="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white p-4 rounded-2xl font-bold shadow-lg shadow-purple-500/30 hover:from-purple-500 hover:to-pink-500 transition duration-300">Влизам веднага</button>
     </div>
 
-    <div id="chat-screen" class="hidden bg-white rounded-2xl shadow-xl w-full max-w-2xl h-[80vh] flex flex-col overflow-hidden">
-        <div class="bg-blue-600 text-white p-4 font-bold flex justify-between items-center">
-            <span>💬 Amore Chat Room</span>
-            <span id="my-name" class="text-sm bg-blue-700 px-3 py-1 rounded-full"></span>
+    <!-- ОСНОВЕН ЕКРАН НА ЧАТА (Скрит в началото) -->
+    <div id="chat-screen" class="hidden bg-slate-900/90 backdrop-blur-md rounded-3xl shadow-2xl w-full max-w-3xl h-[85vh] flex flex-col overflow-hidden border border-purple-500/20">
+        
+        <!-- Горна лента -->
+        <div class="bg-gradient-to-r from-purple-900 to-indigo-900 p-5 font-bold flex justify-between items-center border-b border-purple-500/20">
+            <div class="flex items-center gap-3">
+                <span class="w-3 h-3 bg-emerald-500 rounded-full animate-pulse"></span>
+                <span class="text-lg tracking-wide">✨ Amore VIP Room</span>
+            </div>
+            <span id="my-name" class="text-xs bg-purple-500/20 border border-purple-500/40 px-4 py-1.5 rounded-full font-mono text-purple-300"></span>
         </div>
-        <div id="messages-container" class="flex-1 p-4 overflow-y-auto space-y-3 flex flex-col bg-slate-50"></div>
-        <div class="p-3 border-t bg-white flex gap-2">
-            <input id="message-input" type="text" placeholder="Напишете съобщение..." class="flex-1 p-3 border rounded-xl focus:outline-blue-500" onkeypress="handleKeyPress(event)">
-            <button onclick="sendMessage()" class="bg-blue-600 text-white px-6 rounded-xl font-semibold hover:bg-blue-700">Изпрати</button>
+        
+        <!-- Място за съобщенията -->
+        <div id="messages-container" class="flex-1 p-6 overflow-y-auto space-y-4 flex flex-col bg-slate-950/40"></div>
+
+        <!-- Индикатор за писане -->
+        <div id="typing-indicator" class="px-6 py-2 text-xs text-purple-400 italic hidden animate-pulse">Някой пише...</div>
+
+        <!-- Поле за писане -->
+        <div class="p-4 border-t border-purple-500/10 bg-slate-900/50 flex gap-3 items-center">
+            <input id="message-input" type="text" placeholder="Напиши нещо скрито тук..." class="flex-1 p-4 bg-slate-800/40 border border-slate-700/60 rounded-2xl focus:outline-none focus:border-purple-500 text-white placeholder-slate-500" onkeypress="handleKeyPress(event)" oninput="notifyTyping()">
+            <button onclick="sendMessage()" class="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 h-14 rounded-2xl font-bold hover:from-purple-500 hover:to-pink-500 shadow-md shadow-purple-500/10 transition">Прати</button>
         </div>
     </div>
+
+    <!-- Вграден готин звук за нови съобщения -->
+    <audio id="msg-sound" src="https://mixkit.co" preload="auto"></audio>
 
     <script>
         const socket = io();
         let myCurrentName = "";
+        let typingTimeout;
 
         function joinChat() {
             const name = document.getElementById('username-input').value.trim();
             const pass = document.getElementById('password-input').value;
-            if(!name) return alert("Моля, въведете име!");
+            if(!name) return alert("Хей, въведи някакво име!");
 
             myCurrentName = name;
-            document.getElementById('my-name').innerText = name;
+            document.getElementById('my-name').innerText = `@${name}`;
+            
             document.getElementById('login-screen').classList.add('hidden');
             document.getElementById('chat-screen').classList.remove('hidden');
 
@@ -58,16 +82,29 @@
             if(e.key === 'Enter') sendMessage();
         }
 
+        function notifyTyping() {
+            socket.emit('typing-client', myCurrentName);
+        }
+
+        // Приемане на съобщения
         socket.on('broadcast-message', (data) => {
             const container = document.getElementById('messages-container');
             const msgDiv = document.createElement('div');
             const isMe = data.user === myCurrentName;
             
-            msgDiv.className = `max-w-[70%] p-3 rounded-2xl text-sm ${
-                isMe ? 'bg-blue-500 text-white self-end rounded-tr-none' : 'bg-slate-200 text-slate-800 self-start rounded-tl-none'
-            } ${data.isAdmin ? 'border-2 border-red-500 font-bold' : ''}`;
+            // Пускане на звук, ако съобщението не е от мен
+            if(!isMe) {
+                document.getElementById('msg-sound').play().catch(e => {});
+            }
 
-            msgDiv.innerHTML = `<span class="block text-xs opacity-75 font-semibold">${data.user}</span>${data.text}`;
+            msgDiv.className = `max-w-[75%] p-4 rounded-2xl text-sm transform transition duration-300 scale-95 origin-bottom animate-fade-in ${
+                isMe 
+                ? 'bg-gradient-to-br from-purple-600 to-pink-600 text-white self-end rounded-tr-none shadow-lg shadow-purple-500/10' 
+                : 'bg-slate-800 text-slate-100 self-start rounded-tl-none border border-slate-700/50'
+            } ${data.isAdmin ? 'border-2 border-red-500 font-extrabold shadow-red-500/20' : ''}`;
+
+            msgDiv.innerHTML = `<span class="block text-[10px] uppercase tracking-wider opacity-60 font-bold mb-1 ${isMe ? 'text-purple-200' : 'text-pink-400'}">${data.user} ${data.isAdmin ? '👑 ADMIN' : ''}</span>${data.text}`;
+            
             container.appendChild(msgDiv);
             container.scrollTop = container.scrollHeight;
         });
@@ -75,17 +112,30 @@
         socket.on('system-message', (text) => {
             const container = document.getElementById('messages-container');
             const sysDiv = document.createElement('div');
-            sysDiv.className = "text-center text-xs text-slate-400 my-1 italic";
-            sysDiv.innerText = text;
+            sysDiv.className = "text-center text-xs text-purple-400/60 my-2 tracking-wide font-medium";
+            sysDiv.innerText = `— ${text} —`;
             container.appendChild(sysDiv);
             container.scrollTop = container.scrollHeight;
         });
 
         socket.on('kick-user', (targetName) => {
             if(myCurrentName === targetName) {
-                alert("Бяхте изгонен от администратора!");
+                alert("🚨 Бяхте изгонен от космическата станция на Администратора!");
                 location.reload();
             }
+        });
+
+        // Слушане за писане в реално време
+        socket.on('display-typing', (typerName) => {
+            if(typerName === myCurrentName) return;
+            const indicator = document.getElementById('typing-indicator');
+            indicator.innerText = `✍️ ${typerName} пише в момента...`;
+            indicator.classList.remove('hidden');
+            
+            clearTimeout(typingTimeout);
+            typingTimeout = setTimeout(() => {
+                indicator.classList.add('hidden');
+            }, 2000);
         });
     </script>
 </body>
