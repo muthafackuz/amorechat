@@ -1,5 +1,5 @@
 {
-  "name": "mojat-chat",
+  "name": "amorechat",
   "version": "1.0.0",
   "description": "Без база данни чат",
   "main": "server.js",
