@@ -3,61 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Amore Club | VIP Chat & Profiles</title>
+    <title>Amore Club | Premium VIP Chat</title>
+    <!-- Официален бърз линк за Tailwind CSS -->
     <script src="https://tailwindcss.com"></script>
     <script src="/socket.io/socket.io.js"></script>
 </head>
 <body class="bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950 h-screen flex flex-col items-center justify-center p-4 font-sans text-slate-100">
 
     <!-- ЕКРАН ЗА ВХОД И РЕГИСТРАЦИЯ -->
-    <div id="auth-screen" class="bg-slate-900/90 backdrop-blur-md p-8 rounded-3xl shadow-2xl w-full max-w-md border border-purple-500/20 max-h-[95vh] overflow-y-auto">
+    <div id="auth-screen" class="bg-slate-900/90 backdrop-blur-md p-8 rounded-3xl shadow-2xl w-full max-w-md border border-purple-500/20 max-h-[95vh] overflow-y-auto transform transition duration-500 hover:scale-102">
+        <div class="text-5xl mb-4 text-center animate-bounce">🔮</div>
         <h2 id="auth-title" class="text-3xl font-extrabold mb-2 text-center bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">Amore Club</h2>
-        <p id="auth-subtitle" class="text-xs text-slate-400 text-center mb-6">Влез или си създай профил веднага</p>
+        <p id="auth-subtitle" class="text-xs text-slate-400 text-center mb-6">Влез в тайното място за разговори</p>
         
         <div class="space-y-3">
-            <input id="email-input" type="email" placeholder="Имейл адрес..." class="w-full p-3.5 bg-slate-800/60 border border-slate-700 rounded-xl focus:outline-none focus:border-purple-500 text-white placeholder-slate-500">
-            <input id="password-input" type="password" placeholder="Парола..." class="w-full p-3.5 bg-slate-800/60 border border-slate-700 rounded-xl focus:outline-none focus:border-purple-500 text-white placeholder-slate-500">
+            <input id="email-input" type="email" placeholder="Имейл адрес..." class="w-full p-4 bg-slate-800/50 border border-slate-700 rounded-2xl focus:outline-none focus:border-purple-500 text-white placeholder-slate-500 transition">
+            <input id="password-input" type="password" placeholder="Парола..." class="w-full p-4 bg-slate-800/50 border border-slate-700 rounded-2xl focus:outline-none focus:border-purple-500 text-white placeholder-slate-500 transition">
             
             <!-- Допълнителни полета за регистрация -->
-            <div id="register-fields" class="hidden space-y-3 pt-2 border-t border-slate-800">
-                <input id="nickname-input" type="text" placeholder="Потребителско име (Ник)..." class="w-full p-3.5 bg-slate-800/60 border border-slate-700 rounded-xl focus:outline-none focus:border-purple-500 text-white placeholder-slate-500">
+            <div id="register-fields" class="hidden space-y-3 pt-3 border-t border-purple-500/20">
+                <input id="nickname-input" type="text" placeholder="Потребителско име (Ник)..." class="w-full p-4 bg-slate-800/50 border border-slate-700 rounded-2xl focus:outline-none focus:border-purple-500 text-white placeholder-slate-500 transition">
                 <div class="flex gap-2">
-                    <input id="age-input" type="number" placeholder="Години..." class="w-1/2 p-3.5 bg-slate-800/60 border border-slate-700 rounded-xl focus:outline-none focus:border-purple-500 text-white placeholder-slate-500">
-                    <select id="gender-input" class="w-1/2 p-3.5 bg-slate-800/60 border border-slate-700 rounded-xl focus:outline-none focus:border-purple-500 text-white text-slate-400">
+                    <input id="age-input" type="number" placeholder="Години..." class="w-1/2 p-4 bg-slate-800/50 border border-slate-700 rounded-2xl focus:outline-none focus:border-purple-500 text-white placeholder-slate-500 transition">
+                    <select id="gender-input" class="w-1/2 p-4 bg-slate-800/50 border border-slate-700 rounded-2xl focus:outline-none focus:border-purple-500 text-slate-400">
                         <option value="Мъж">Мъж 🧑</option>
                         <option value="Жена">Жена 👩</option>
                         <option value="Друго">Тайна 🤫</option>
                     </select>
                 </div>
-                <input id="avatar-input" type="text" placeholder="Линк за профилна снимка (незадължително)..." class="w-full p-3.5 bg-slate-800/60 border border-slate-700 rounded-xl focus:outline-none focus:border-purple-500 text-white placeholder-slate-500">
-                <textarea id="info-input" placeholder="Кратко инфо за мен..." class="w-full p-3.5 bg-slate-800/60 border border-slate-700 rounded-xl focus:outline-none focus:border-purple-500 text-white h-20 placeholder-slate-500 resize-none"></textarea>
+                <input id="avatar-input" type="text" placeholder="Линк за снимка (незадължително)..." class="w-full p-4 bg-slate-800/50 border border-slate-700 rounded-2xl focus:outline-none focus:border-purple-500 text-white placeholder-slate-500 transition">
+                <textarea id="info-input" placeholder="Кратко инфо за мен..." class="w-full p-4 bg-slate-800/50 border border-slate-700 rounded-2xl focus:outline-none focus:border-purple-500 text-white h-20 placeholder-slate-500 resize-none transition"></textarea>
             </div>
         </div>
-
-        <button onclick="handleAuth()" id="main-auth-btn" class="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white p-4 rounded-xl font-bold mt-6 hover:from-purple-500 hover:to-pink-500 shadow-lg shadow-purple-500/20 transition">Влизане</button>
+        <button onclick="handleAuth()" id="main-auth-btn" class="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white p-4 rounded-2xl font-bold mt-6 hover:from-purple-500 hover:to-pink-500 shadow-lg shadow-purple-500/30 transition duration-300">Влизане</button>
         
         <p class="text-center text-xs text-slate-400 mt-4">
             <span id="switch-text">Нямаш профил?</span> 
             <button onclick="toggleAuthMode()" id="switch-btn" class="text-purple-400 font-bold hover:underline">Регистрирай се тук</button>
         </p>
     </div>
-    <!-- ОСНОВЕН ЕКРАН НА ЧАТ СТАЯТА -->
+        <!-- ОСНОВЕН ЕКРАН НА ЧАТ СТАЯТА -->
     <div id="chat-screen" class="hidden bg-slate-900/90 backdrop-blur-md rounded-3xl shadow-2xl w-full max-w-4xl h-[85vh] flex overflow-hidden border border-purple-500/20 animate-fade-in">
         <div class="flex-1 flex flex-col h-full border-r border-slate-800">
-            <div class="bg-gradient-to-r from-purple-900 to-indigo-900 p-4 font-bold flex justify-between items-center">
-                <span class="flex items-center gap-2"><span class="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-pulse"></span> 🔮 Amore VIP Chat</span>
-                <span id="user-badge" class="text-xs bg-purple-500/20 border border-purple-500/40 px-3 py-1 rounded-full font-mono"></span>
+            <!-- Горна лента -->
+            <div class="bg-gradient-to-r from-purple-900 to-indigo-900 p-5 font-bold flex justify-between items-center border-b border-purple-500/20">
+                <span class="flex items-center gap-2"><span class="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-pulse"></span> ✨ Amore VIP Chat Room</span>
+                <span id="user-badge" class="text-xs bg-purple-500/20 border border-purple-500/40 px-4 py-1.5 rounded-full font-mono text-purple-300"></span>
             </div>
-            
-            <div id="messages-container" class="flex-1 p-5 overflow-y-auto space-y-3.5 bg-slate-950/50"></div>
-
-            <div class="p-4 bg-slate-900/40 flex gap-3 border-t border-slate-800">
-                <input id="message-input" type="text" placeholder="Напиши нещо в стаята..." class="flex-1 p-3.5 bg-slate-800/40 border border-slate-700/60 rounded-xl focus:outline-none focus:border-purple-500 text-white" onkeypress="if(event.key==='Enter') sendMessage()">
-                <button onclick="sendMessage()" class="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-7 rounded-xl font-bold hover:from-purple-500 hover:to-pink-500 transition">Прати</button>
+            <!-- Messages -->
+            <div id="messages-container" class="flex-1 p-6 overflow-y-auto space-y-4 flex flex-col bg-slate-950/50"></div>
+            <!--Input-->
+            <div class="p-4 bg-slate-900/40 flex gap-3 border-t border-purple-500/10">
+                <input id="message-input" type="text" placeholder="Напиши нещо в стаята..." class="flex-1 p-4 bg-slate-800/40 border border-slate-700/60 rounded-2xl focus:outline-none focus:border-purple-500 text-white placeholder-slate-500" onkeypress="if(event.key==='Enter') sendMessage()">
+                <button onclick="sendMessage()" class="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 rounded-2xl font-bold hover:from-purple-500 hover:to-pink-500 shadow-md shadow-purple-500/10 transition">Прати</button>
             </div>
         </div>
     </div>
-
     <!-- ПОП-ЪП ЗА ПРЕГЛЕД НА ПРОФИЛ И АДМИН ПАНЕЛ -->
     <div id="profile-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
         <div class="bg-slate-900 border border-purple-500/30 p-6 rounded-3xl w-full max-w-sm text-center relative">
@@ -69,7 +70,6 @@
                 <span id="modal-gender"></span>
             </div>
             <p id="modal-info" class="text-sm text-slate-300 bg-slate-950/50 p-4 rounded-xl italic mb-6 text-left border border-slate-800"></p>
-            
             <!-- СКРИТИ АДМИН БУТОНИ -->
             <div id="admin-controls" class="hidden border-t border-slate-800 pt-4 space-y-2">
                 <p class="text-[10px] text-red-400 font-bold uppercase tracking-wider mb-2">👮 Админ Контрол Панел</p>
@@ -82,8 +82,8 @@
         </div>
     </div>
 
-    <audio id="msg-sound" src="https://mixkit.co" preload="auto"></audio>
-    <!-- Свързване на Firebase директно през браузъра (v9 модулна версия) -->
+    <audio id="msg-sound" src="https://mixkit.co" preload="auto"></audio>    
+    <!-- Връзка с Firebase директно през браузъра (v9 модулна версия) -->
     <script type="module">
         import { initializeApp } from "https://gstatic.com";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://gstatic.com";
@@ -114,7 +114,7 @@
             document.getElementById('auth-title').innerText = isRegisterMode ? 'Регистрация' : 'Amore Club';
             document.getElementById('main-auth-btn').innerText = isRegisterMode ? 'Създай профил' : 'Влизане';
             document.getElementById('switch-text').innerText = isRegisterMode ? 'Вече имаш профил?' : 'Нямаш профил?';
-            document.getElementById('switch-btn').innerText = isRegisterMode ? 'Влез оттук' : 'Регистрирай се тук';
+            document.getElementById('switch-btn').innerText = isRegisterMode ? 'Регистрирай се тук' : 'Влез оттук';
         }
 
         window.handleAuth = async function() {
@@ -188,7 +188,7 @@
             if(!isMe) document.getElementById('msg-sound').play().catch(()=>{});
 
             msgDiv.className = `max-w-[75%] p-3.5 rounded-2xl text-sm ${
-                isMe ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white self-end rounded-tr-none' : 'bg-slate-800 text-slate-100 self-start rounded-tl-none border border-slate-700/40'
+                isMe ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white self-end rounded-tr-none shadow-lg shadow-purple-500/10' : 'bg-slate-800 text-slate-100 self-start rounded-tl-none border border-slate-700/40'
             } ${data.role === 'admin' ? 'border-2 border-red-500 shadow-lg shadow-red-500/10' : ''}`;
 
             msgDiv.innerHTML = `<button onclick="window.openProfileCard('${data.user}', '${data.role}')" class="block text-[10px] font-extrabold uppercase tracking-wider opacity-70 mb-1 hover:underline text-purple-300 text-left">${data.user} ${data.role==='admin'?'👑':''}</button>${data.text}`;
