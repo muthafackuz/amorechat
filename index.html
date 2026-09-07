@@ -59,23 +59,22 @@
             <select id="gender-input">
                 <option value="Мъж">Мъж 🧑</option>
                 <option value="Жена">Жена 👩</option>
-                <option value="Тайна">Друго 🤫</option>
             </select>
             <textarea id="info-input" placeholder="Кратко инфо за мен..." style="height: 70px; resize: none;"></textarea>
         </div>
         
-        <button id="main-auth-btn">Влизане</button>
+        <button id="main-auth-btn">Влез</button>
         <p style="font-size:12px; color:#94a3b8; margin-top:15px;">
             <span id="switch-text">Нямаш профил?</span> 
-            <button id="switch-btn" style="background:none; border:none; color:#c084fc; font-weight:bold; cursor:pointer; padding:0; display:inline;">Регистрирай се тук</button>
+            <button id="switch-btn" style="background:none; border:none; color:#c084fc; font-weight:bold; cursor:pointer; padding:0; display:inline;">Регистрирай се от тук</button>
         </p>
     </div>
 
     <!-- ОСНОВЕН ЕКРАН НА ЧАТ СТАЯТА -->
-     <h1><color="red"><center><b>САЙТА Е В ПРОЦЕС НА РАЗРАБОТКА!</b></center></color></h1>
+     <h1><center><b>САЙТА Е В ПРОЦЕС НА РАЗРАБОТКА!</b></center></h1>
     <div id="chat-screen" class="hidden">
         <div class="chat-bar">
-            <span>🔮 Amore VIP Chat Room</span>
+            <span>🔮 AmoreClub ЧАТ</span>
             <div style="display: flex; align-items: center; gap: 10px;">
                 <span id="user-badge" style="font-size:12px; background:rgba(168,85,247,0.2); padding:5px 12px; border-radius:12px; color:#c084fc;"></span>
                 <button id="logout-btn" style="width: auto; padding: 6px 14px; background: #ef4444; font-size: 11px; border-radius: 8px;">Изход</button>
@@ -84,7 +83,7 @@
         <div id="messages-container"></div>
         <div class="input-bar">
             <input id="message-input" type="text" placeholder="Напиши съобщение..." style="margin:0; flex:1;">
-            <button id="send-msg-btn" style="width:auto; padding:0 30px;">Прати</button>
+            <button id="send-msg-btn" style="width:auto; padding:0 30px;">Изпрати</button>
         </div>
     </div>
 
@@ -135,7 +134,7 @@
         document.getElementById('main-auth-btn').addEventListener('click', () => {
             const email = document.getElementById('email-input').value.trim();
             const password = document.getElementById('password-input').value;
-            if(!email || !password) return alert("Попълнете имейл и парола!");
+            if(!email || !password) return alert("Попълнете имейл и парола! :)");
 
             const data = { email, password, isRegister: isRegisterMode };
             if(isRegisterMode) {
@@ -143,7 +142,7 @@
                 data.age = document.getElementById('age-input').value;
                 data.gender = document.getElementById('gender-input').value;
                 data.info = document.getElementById('info-input').value.trim();
-                if(!data.nickname || !data.age) return alert("Попълнете никнейм и години!");
+                if(!data.nickname || !data.age) return alert("Попълнете никнейм и години! :)");
             }
             socket.emit('auth-action', data);
         });
@@ -218,7 +217,7 @@
             container.appendChild(d); container.scrollTop = container.scrollHeight;
         });
 
-        socket.on('kick-user', () => { alert("🚨 Бяхте изгонен от Администратора!"); location.reload(); });
+        socket.on('kick-user', () => { alert("🚨 Бяхте изгонен от Администратора! :)"); location.reload(); });
     </script>
 </body>
 </html>
