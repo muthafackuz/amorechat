@@ -7,8 +7,10 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
+// Задаваме парола за администратора
 const ADMIN_PASSWORD = "moja-taina-parola";
 
+// Казваме на сървъра изрично да отваря index.html
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
@@ -48,5 +50,5 @@ io.on('connection', (socket) => {
 
 const PORT = process.env.PORT || 10000;
 server.listen(PORT, () => {
-    console.log(`Чатът работи на порт ${PORT}`);
+    console.log(`Server running on port ${PORT}`);
 });
