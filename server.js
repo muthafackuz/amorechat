@@ -46,7 +46,7 @@ io.on('connection', (socket) => {
                 currentRole = existingUser.role;
                 onlineSockets[currentNickname] = socket;
                 socket.emit('auth-success', existingUser);
-                io.emit('system-message', `✨ ${currentNickname} влезе в стаята.`);
+                io.emit('system-message', `✨ ${currentNickname} влезе в чата.`);
                 return;
             }
 
@@ -72,7 +72,7 @@ io.on('connection', (socket) => {
             }
 
             if (!foundUser) {
-                return socket.emit('auth-error', 'Грешен имейл или парола!');
+                return socket.emit('auth-error', 'Грешен имейл или парола! :)');
             }
 
             currentNickname = foundUser.nickname;
@@ -80,7 +80,7 @@ io.on('connection', (socket) => {
             onlineSockets[currentNickname] = socket;
 
             socket.emit('auth-success', foundUser);
-            io.emit('system-message', `✨ ${currentNickname} влезе в стаята.`);
+            io.emit('system-message', `✨ ${currentNickname} влезе в стаята. :)`);
         }
     });
 
@@ -94,7 +94,7 @@ io.on('connection', (socket) => {
                 const target = msg.replace('/unmute ', '').trim();
                 if (mutedUsers.has(target)) {
                     mutedUsers.delete(target);
-                    io.emit('system-message', `🔊 Потребителят ${target} беше амнистиран и може да пише.`);
+                    io.emit('system-message', `🔊 Потребителят ${target} беше амнистиран от Администратора и вече може да пише.`);
                 }
                 return;
             }
@@ -124,7 +124,7 @@ io.on('connection', (socket) => {
                 }
 
                 if (unbannedSomething) {
-                    io.emit('system-message', `🔓 Потребителят ${target} беше напълно амнистиран и неговият имейл и никнейм бяха отблокирани.`);
+                    io.emit('system-message', `🔓 Потребителят ${target} беше напълно амнистиран от Администратора и неговият имейл и никнейм бяха отблокирани.`);
                 } else {
                     socket.emit('system-message', `❌ Потребителят ${target} не беше намерен в списъка с активни банове.`);
                 }
@@ -166,7 +166,7 @@ io.on('connection', (socket) => {
             if (targetSocket) targetSocket.emit('kick-user');
         } else if (action === 'mute') {
             mutedUsers.add(targetName);
-            io.emit('system-message', `🔇 Потребителят ${targetName} беше заглушен.`);
+            io.emit('system-message', `🔇 Потребителят ${targetName} беше заглушен от Администратора.`);
         } else if (action === 'ban') {
             bannedUsers.add(targetName.toLowerCase());
             
@@ -177,7 +177,7 @@ io.on('connection', (socket) => {
                 }
             }
 
-            io.emit('system-message', `🚫 Потребителят ${targetName} получил ПОСТОЯНЕН БАН от клуба!`);
+            io.emit('system-message', `🚫 Потребителят ${targetName} получил ПОСТОЯНЕН БАН от клуба от Администратора!`);
             if (targetSocket) targetSocket.emit('kick-user');
         }
     });
@@ -185,7 +185,7 @@ io.on('connection', (socket) => {
     socket.on('disconnect', () => {
         if (currentNickname) {
             delete onlineSockets[currentNickname];
-            io.emit('system-message', `👋 ${currentNickname} напусна стаята.`);
+            io.emit('system-message', `👋 ${currentNickname} напусна стаята. :)`);
         }
     });
 });
