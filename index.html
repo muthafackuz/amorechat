@@ -35,9 +35,9 @@
             </select>
             <textarea id="info-input" placeholder="За мен..."></textarea>
         </div>
-        <button onclick="window.handleAuth()" id="main-auth-btn">Влизане</button>
+        <button id="main-auth-btn">Влизане</button>
         <p style="font-size:12px; color:#94a3b8; margin-top:15px;">
-            <span id="switch-text">Нямаш профил?</span> <button onclick="window.toggleAuthMode()" id="switch-btn" style="background:none; border:none; color:#c084fc; width:auto; padding:0; display:inline; cursor:pointer; font-weight:bold;">Регистрирай се</button>
+            <span id="switch-text">Нямаш профил?</span> <button id="switch-btn" style="background:none; border:none; color:#c084fc; width:auto; padding:0; display:inline; cursor:pointer; font-weight:bold;">Регистрирай се</button>
         </p>
     </div>
 
@@ -49,9 +49,10 @@
         <div id="messages-container"></div>
         <div class="input-bar">
             <input id="message-input" type="text" placeholder="Напиши съобщение..." style="margin:0; flex:1;">
-            <button onclick="window.sendMessage()" style="width:auto; padding:0 25px;">Прати</button>
+            <button id="send-msg-btn" style="width:auto; padding:0 25px;">Прати</button>
         </div>
-    </div>    <!-- Свързване на Firebase директно през браузъра (v9 модулна версия) -->
+    </div>
+    <!-- Свързване на Firebase и автоматично задействане на бутоните -->
     <script type="module">
         import { initializeApp } from "https://gstatic.com";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://gstatic.com";
@@ -73,19 +74,21 @@
         let isRegisterMode = false;
         let myProfile = null;
 
-        window.toggleAuthMode = function() {
+        // Автоматично хващане на бутоните от кода, за да не замръзват никога
+        document.getElementById('switch-btn').addEventListener('click', () => {
             isRegisterMode = !isRegisterMode;
             document.getElementById('register-fields').classList.toggle('hidden', !isRegisterMode);
             document.getElementById('auth-title').innerText = isRegisterMode ? 'Регистрация' : 'Amore Club';
             document.getElementById('main-auth-btn').innerText = isRegisterMode ? 'Създай профил' : 'Влизане';
             document.getElementById('switch-text').innerText = isRegisterMode ? 'Вече имаш профил?' : 'Нямаш профил?';
             document.getElementById('switch-btn').innerText = isRegisterMode ? 'Влез оттук' : 'Регистрирай се';
-        }
+        });
 
-        window.handleAuth = async function() {
+        document.getElementById('main-auth-btn').addEventListener('click', async () => {
             const email = document.getElementById('email-input').value.trim();
             const password = document.getElementById('password-input').value;
             if(!email || !password) return alert("Попълнете полетата!");
+            
             try {
                 if(isRegisterMode) {
                     const nickname = document.getElementById('nickname-input').value.trim();
@@ -93,6 +96,7 @@
                     const gender = document.getElementById('gender-input').value;
                     const info = document.getElementById('info-input').value.trim() || "Няма инфо.";
                     if(!nickname || !age) return alert("Попълнете ник и години!");
+                    
                     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                     const role = (email.toLowerCase() === 'admin@amoreclub.net') ? 'admin' : 'user';
                     myProfile = { uid: userCredential.user.uid, email, nickname, age, gender, info, role };
@@ -102,20 +106,28 @@
                     const userDoc = await getDoc(doc(db, "users", userCredential.user.uid));
                     myProfile = userDoc.exists() ? userDoc.data() : { nickname: "Потребител", role: "user" };
                 }
+                
                 document.getElementById('auth-screen').classList.add('hidden');
                 document.getElementById('chat-screen').classList.remove('hidden');
                 document.getElementById('chat-screen').style.display = 'flex';
                 document.getElementById('user-badge').innerText = `@${myProfile.nickname} (${myProfile.role})`;
                 socket.emit('join-verified-user', myProfile);
-            } catch (error) { alert("Грешка: " + error.message); }
-        }
+            } catch (error) { 
+                alert("Грешка: " + error.message); 
+            }
+        });
 
-        window.sendMessage = function() {
+        const doSendMessage = () => {
             const input = document.getElementById('message-input');
             if(!input.value.trim()) return;
             socket.emit('chat-message', input.value.trim());
             input.value = "";
-        }
+        };
+
+        document.getElementById('send-msg-btn').addEventListener('click', doSendMessage);
+        document.getElementById('message-input').addEventListener('keypress', (e) => {
+            if(e.key === 'Enter') doSendMessage();
+        });
 
         socket.on('broadcast-message', (data) => {
             const container = document.getElementById('messages-container');
