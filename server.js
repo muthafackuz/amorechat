@@ -42,6 +42,9 @@ io.on('connection', (socket) => {
             isAdmin: isAdmin
         });
     });
+    socket.on('typing-client', (typerName) => {
+        io.emit('display-typing', typerName);
+    });
 
     socket.on('disconnect', () => {
         io.emit('system-message', `${username} напусна чата.`);
