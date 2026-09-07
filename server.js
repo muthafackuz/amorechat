@@ -4,10 +4,10 @@ const { Server } = require('socket.io');
 const path = require('path');
 const admin = require('firebase-admin');
 
-// 🔐 Твоите лични ключове от Firebase (Конфигурирани)
+// 🔐 Твоите лични ключове от Firebase (Вече конфигурирани за теб)
 const firebaseConfig = {
   apiKey: "AIzaSyAECHxZNoWBbpx-eg1HvAGOfuOLSI4j4ho",
-  authDomain: "amorechat-77ecf.firebaseapp.com",
+  authDomain: "://firebaseapp.com",
   projectId: "amorechat-77ecf",
   storageBucket: "amorechat-77ecf.firebasestorage.app",
   messagingSenderId: "830014963598",
@@ -88,7 +88,7 @@ io.on('connection', (socket) => {
                     return socket.emit('auth-error', 'Потребителят не е намерен! Проверете имейла или направете Регистрация.');
                 }
                 
-                const userData = snapshot.docs[0].data();
+                const userData = snapshot.docs.data();
                 userNickname = userData.nickname;
                 userEmail = userData.email;
                 userRole = userData.role;
@@ -136,7 +136,7 @@ io.on('connection', (socket) => {
         } 
         else if (action === 'ban') {
             bannedUsers.add(targetName);
-            io.emit('system-message', `🚫 Потребителят ${targetName} получи постоянен БАН!`);
+            io.emit('system-message', `🚫 Потребителят ${targetName} получил постоянен БАН!`);
             if (targetSocket) targetSocket.emit('kick-user');
         }
     });
