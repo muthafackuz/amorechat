@@ -44,7 +44,7 @@ io.on('connection', (socket) => {
             // Създаване на нов профил
             const uid = "_" + Math.random().toString(36).substr(2, 9);
             
-            // ГАРАНТИРАНО АДМИН ПРАВО: Първият регистриран с ник Admin или с този имейл става главен шеф
+            // ГАРАНТИРАНО АДМИН ПРАВО
             const role = (cleanEmail === 'admin@amoreclub.net' || nickname.toLowerCase() === 'admin' || nickname.toLowerCase() === 'pavel') ? 'admin' : 'user';
 
             const newProfile = { uid, email: cleanEmail, password, nickname, age, gender, info, role };
@@ -79,11 +79,38 @@ io.on('connection', (socket) => {
         }
     });
 
-    // Изпращане на съобщение
+    // Изпращане на съобщение + ТЕКСТОВИ АДМИН КОМАНДИ
     socket.on('chat-message', (msg) => {
         if (!currentNickname) return;
+
+        // Проверка дали съобщението е АДМИН команда за Unmute или Unban
+        if (currentRole === 'admin') {
+            if (msg.startsWith('/unmute ')) {
+                const target = msg.replace('/unmute ', '').trim();
+                if (mutedUsers.has(target)) {
+                    mutedUsers.delete(target);
+                    io.emit('system-message', `🔊 Потребителят ${target} беше АМНИСТИРАН и вече може да пише отново.`);
+                } else {
+                    socket.emit('system-message', `❌ Потребителят ${target} не е бил заглушаван.`);
+                }
+                return; // Спираме изпращането като обикновено съобщение
+            }
+
+            if (msg.startsWith('/unban ')) {
+                const target = msg.replace('/unban ', '').trim().toLowerCase();
+                if (bannedUsers.has(target)) {
+                    bannedUsers.delete(target);
+                    io.emit('system-message', `🔓 Потребителят ${target} беше АМНИСТИРАН и банът му беше премахнат.`);
+                } else {
+                    socket.emit('system-message', `❌ Потребителят ${target} няма активен бан.`);
+                }
+                return; // Спираме изпращането като обикновено съобщение
+            }
+        }
+
+        // Проверка за обикновен мут
         if (mutedUsers.has(currentNickname)) {
-            return socket.emit('system-message', '🔇 Вие сте заглушен от Администратора!');
+            return socket.emit('system-message', '🔇 Вие сте заглушен от Администратора и не можете да пишете!');
         }
 
         io.emit('broadcast-message', {
@@ -93,7 +120,7 @@ io.on('connection', (socket) => {
         });
     });
 
-    // Запитване за преглед на нечий профил (при клик на име)
+    // Запитване за преглед на нечий профил
     socket.on('get-user-profile', (targetName) => {
         let foundProfile = null;
         for (let uid in usersDB) {
@@ -113,7 +140,7 @@ io.on('connection', (socket) => {
         }
     });
 
-    // 👑 АДМИН ПАНЕЛ (Kick, Mute, Ban)
+    // АДМИН ПАНЕЛ ОТ ЕКРАНА (Kick, Mute, Ban)
     socket.on('admin-action', (data) => {
         if (currentRole !== 'admin') return; 
         const { action, targetName } = data;
