@@ -3,93 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Amore Club | Premium VIP Chat</title>
-    <!-- Официален бърз линк за Tailwind CSS -->
-    <script src="https://tailwindcss.com"></script>
+    <title>Amore Club</title>
+    <style>
+        body { background: linear-gradient(135deg, #020617, #3b0764, #020617); min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: sans-serif; color: #f8fafc; margin: 0; padding: 20px; box-sizing: border-box; }
+        .box { background: rgba(15, 23, 42, 0.9); padding: 30px; rounded-radius: 24px; border-radius: 24px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); width: 100%; max-width: 400px; border: 1px solid rgba(168, 85, 247, 0.2); text-align: center; }
+        h2 { font-size: 2rem; margin: 0 0 10px 0; background: linear-gradient(to right, #c084fc, #db2777); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        input, select, textarea { w-full; width: 100%; padding: 12px; background: rgba(30, 41, 59, 0.5); border: 1px solid #334155; border-radius: 12px; color: white; margin-bottom: 12px; box-sizing: border-box; }
+        input:focus { border-color: #a855f7; outline: none; }
+        button { width: 100%; padding: 14px; background: linear-gradient(to right, #9333ea, #db2777); border: none; border-radius: 12px; color: white; font-weight: bold; cursor: pointer; font-size: 1rem; }
+        button:hover { opacity: 0.9; }
+        .hidden { display: none !important; }
+        #chat-screen { width: 100%; max-width: 800px; height: 80vh; background: rgba(15, 23, 42, 0.9); border-radius: 24px; border: 1px solid rgba(168, 85, 247, 0.2); display: flex; flex-direction: column; overflow: hidden; }
+        #messages-container { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; background: rgba(2, 6, 17, 0.4); }
+        .chat-bar { background: linear-gradient(to right, #581c87, #311042); padding: 15px; font-weight: bold; display: flex; justify-content: space-between; }
+        .input-bar { padding: 15px; display: flex; gap: 10px; background: rgba(15, 23, 42, 0.5); }
+    </style>
     <script src="/socket.io/socket.io.js"></script>
 </head>
-<body class="bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950 h-screen flex flex-col items-center justify-center p-4 font-sans text-slate-100">
+<body>
 
-    <!-- ЕКРАН ЗА ВХОД И РЕГИСТРАЦИЯ -->
-    <div id="auth-screen" class="bg-slate-900/90 backdrop-blur-md p-8 rounded-3xl shadow-2xl w-full max-w-md border border-purple-500/20 max-h-[95vh] overflow-y-auto transform transition duration-500 hover:scale-102">
-        <div class="text-5xl mb-4 text-center animate-bounce">🔮</div>
-        <h2 id="auth-title" class="text-3xl font-extrabold mb-2 text-center bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">Amore Club</h2>
-        <p id="auth-subtitle" class="text-xs text-slate-400 text-center mb-6">Влез в тайното място за разговори</p>
-        
-        <div class="space-y-3">
-            <input id="email-input" type="email" placeholder="Имейл адрес..." class="w-full p-4 bg-slate-800/50 border border-slate-700 rounded-2xl focus:outline-none focus:border-purple-500 text-white placeholder-slate-500 transition">
-            <input id="password-input" type="password" placeholder="Парола..." class="w-full p-4 bg-slate-800/50 border border-slate-700 rounded-2xl focus:outline-none focus:border-purple-500 text-white placeholder-slate-500 transition">
-            
-            <!-- Допълнителни полета за регистрация -->
-            <div id="register-fields" class="hidden space-y-3 pt-3 border-t border-purple-500/20">
-                <input id="nickname-input" type="text" placeholder="Потребителско име (Ник)..." class="w-full p-4 bg-slate-800/50 border border-slate-700 rounded-2xl focus:outline-none focus:border-purple-500 text-white placeholder-slate-500 transition">
-                <div class="flex gap-2">
-                    <input id="age-input" type="number" placeholder="Години..." class="w-1/2 p-4 bg-slate-800/50 border border-slate-700 rounded-2xl focus:outline-none focus:border-purple-500 text-white placeholder-slate-500 transition">
-                    <select id="gender-input" class="w-1/2 p-4 bg-slate-800/50 border border-slate-700 rounded-2xl focus:outline-none focus:border-purple-500 text-slate-400">
-                        <option value="Мъж">Мъж 🧑</option>
-                        <option value="Жена">Жена 👩</option>
-                        <option value="Друго">Тайна 🤫</option>
-                    </select>
-                </div>
-                <input id="avatar-input" type="text" placeholder="Линк за снимка (незадължително)..." class="w-full p-4 bg-slate-800/50 border border-slate-700 rounded-2xl focus:outline-none focus:border-purple-500 text-white placeholder-slate-500 transition">
-                <textarea id="info-input" placeholder="Кратко инфо за мен..." class="w-full p-4 bg-slate-800/50 border border-slate-700 rounded-2xl focus:outline-none focus:border-purple-500 text-white h-20 placeholder-slate-500 resize-none transition"></textarea>
-            </div>
+    <div id="auth-screen" class="box">
+        <h2 id="auth-title">Amore Club</h2>
+        <p style="color:#94a3b8; font-size:12px; margin-bottom:20px;">Влез или се регистрирай в тайния чат</p>
+        <input id="email-input" type="email" placeholder="Имейл адрес...">
+        <input id="password-input" type="password" placeholder="Парола...">
+        <div id="register-fields" class="hidden">
+            <input id="nickname-input" type="text" placeholder="Потребителско име (Ник)...">
+            <input id="age-input" type="number" placeholder="Години...">
+            <select id="gender-input">
+                <option value="Мъж">Мъж 🧑</option>
+                <option value="Жена">Жена 👩</option>
+            </select>
+            <textarea id="info-input" placeholder="За мен..."></textarea>
         </div>
-        <button onclick="handleAuth()" id="main-auth-btn" class="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white p-4 rounded-2xl font-bold mt-6 hover:from-purple-500 hover:to-pink-500 shadow-lg shadow-purple-500/30 transition duration-300">Влизане</button>
-        
-        <p class="text-center text-xs text-slate-400 mt-4">
-            <span id="switch-text">Нямаш профил?</span> 
-            <button onclick="toggleAuthMode()" id="switch-btn" class="text-purple-400 font-bold hover:underline">Регистрирай се тук</button>
+        <button onclick="handleAuth()" id="main-auth-btn">Влизане</button>
+        <p style="font-size:12px; color:#94a3b8; margin-top:15px;">
+            <span id="switch-text">Нямаш профил?</span> <button onclick="toggleAuthMode()" id="switch-btn" style="background:none; border:none; color:#c084fc; width:auto; padding:0; display:inline; cursor:pointer; font-weight:bold;">Регистрирай се</button>
         </p>
     </div>
-        <!-- ОСНОВЕН ЕКРАН НА ЧАТ СТАЯТА -->
-    <div id="chat-screen" class="hidden bg-slate-900/90 backdrop-blur-md rounded-3xl shadow-2xl w-full max-w-4xl h-[85vh] flex overflow-hidden border border-purple-500/20 animate-fade-in">
-        <div class="flex-1 flex flex-col h-full border-r border-slate-800">
-            <!-- Горна лента -->
-            <div class="bg-gradient-to-r from-purple-900 to-indigo-900 p-5 font-bold flex justify-between items-center border-b border-purple-500/20">
-                <span class="flex items-center gap-2"><span class="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-pulse"></span> ✨ Amore VIP Chat Room</span>
-                <span id="user-badge" class="text-xs bg-purple-500/20 border border-purple-500/40 px-4 py-1.5 rounded-full font-mono text-purple-300"></span>
-            </div>
-            <!-- Messages -->
-            <div id="messages-container" class="flex-1 p-6 overflow-y-auto space-y-4 flex flex-col bg-slate-950/50"></div>
-            <!--Input-->
-            <div class="p-4 bg-slate-900/40 flex gap-3 border-t border-purple-500/10">
-                <input id="message-input" type="text" placeholder="Напиши нещо в стаята..." class="flex-1 p-4 bg-slate-800/40 border border-slate-700/60 rounded-2xl focus:outline-none focus:border-purple-500 text-white placeholder-slate-500" onkeypress="if(event.key==='Enter') sendMessage()">
-                <button onclick="sendMessage()" class="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 rounded-2xl font-bold hover:from-purple-500 hover:to-pink-500 shadow-md shadow-purple-500/10 transition">Прати</button>
-            </div>
+
+    <div id="chat-screen" class="hidden">
+        <div class="chat-bar">
+            <span>🔮 Amore VIP Chat</span>
+            <span id="user-badge" style="font-size:12px; background:rgba(168,85,247,0.2); padding:4px 10px; border-radius:12px;"></span>
         </div>
-    </div>
-    <!-- ПОП-ЪП ЗА ПРЕГЛЕД НА ПРОФИЛ И АДМИН ПАНЕЛ -->
-    <div id="profile-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-        <div class="bg-slate-900 border border-purple-500/30 p-6 rounded-3xl w-full max-w-sm text-center relative">
-            <button onclick="closeProfile()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-xl">✕</button>
-            <img id="modal-avatar" src="" class="w-24 h-24 rounded-full mx-auto border-2 border-purple-500 object-cover mb-4">
-            <h3 id="modal-name" class="text-2xl font-bold text-white mb-1"></h3>
-            <div class="flex justify-center gap-3 text-xs text-slate-400 mb-4">
-                <span id="modal-age"></span>
-                <span id="modal-gender"></span>
-            </div>
-            <p id="modal-info" class="text-sm text-slate-300 bg-slate-950/50 p-4 rounded-xl italic mb-6 text-left border border-slate-800"></p>
-            <!-- СКРИТИ АДМИН БУТОНИ -->
-            <div id="admin-controls" class="hidden border-t border-slate-800 pt-4 space-y-2">
-                <p class="text-[10px] text-red-400 font-bold uppercase tracking-wider mb-2">👮 Админ Контрол Панел</p>
-                <div class="flex gap-2">
-                    <button onclick="adminAction('kick')" class="flex-1 bg-amber-600/20 text-amber-400 border border-amber-500/30 py-2 rounded-xl text-xs font-bold hover:bg-amber-600/40 transition">Kick</button>
-                    <button onclick="adminAction('mute')" class="flex-1 bg-orange-600/20 text-orange-400 border border-orange-500/30 py-2 rounded-xl text-xs font-bold hover:bg-orange-600/40 transition">Mute</button>
-                    <button onclick="adminAction('ban')" class="flex-1 bg-red-600 text-white py-2 rounded-xl text-xs font-bold hover:bg-red-700 transition">BAN</button>
-                </div>
-            </div>
+        <div id="messages-container"></div>
+        <div class="input-bar">
+            <input id="message-input" type="text" placeholder="Напиши съобщение..." style="margin:0; flex:1;">
+            <button onclick="sendMessage()" style="width:auto; padding:0 25px;">Прати</button>
         </div>
     </div>
 
-    <audio id="msg-sound" src="https://mixkit.co" preload="auto"></audio>    
-    <!-- Връзка с Firebase директно през браузъра (v9 модулна версия) -->
     <script type="module">
         import { initializeApp } from "https://gstatic.com";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://gstatic.com";
         import { getFirestore, doc, setDoc, getDoc } from "https://gstatic.com";
 
-        // 🔐 Твоите лични реални ключове от Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyAECHxZNoWBbpx-eg1HvAGOfuOLSI4j4ho",
             authDomain: "://firebaseapp.com",
@@ -102,11 +71,9 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-
         const socket = io();
         let isRegisterMode = false;
         let myProfile = null;
-        let activeProfileView = null;
 
         window.toggleAuthMode = function() {
             isRegisterMode = !isRegisterMode;
@@ -114,69 +81,41 @@
             document.getElementById('auth-title').innerText = isRegisterMode ? 'Регистрация' : 'Amore Club';
             document.getElementById('main-auth-btn').innerText = isRegisterMode ? 'Създай профил' : 'Влизане';
             document.getElementById('switch-text').innerText = isRegisterMode ? 'Вече имаш профил?' : 'Нямаш профил?';
-            document.getElementById('switch-btn').innerText = isRegisterMode ? 'Регистрирай се тук' : 'Влез оттук';
+            document.getElementById('switch-btn').innerText = isRegisterMode ? 'Влез оттук' : 'Регистрирай се';
         }
 
         window.handleAuth = async function() {
             const email = document.getElementById('email-input').value.trim();
             const password = document.getElementById('password-input').value;
-            
-            if(!email || !password) return alert("Моля попълнете имейл и парола!");
-
+            if(!email || !password) return alert("Попълнете полетата!");
             try {
                 if(isRegisterMode) {
                     const nickname = document.getElementById('nickname-input').value.trim();
                     const age = document.getElementById('age-input').value;
                     const gender = document.getElementById('gender-input').value;
-                    const info = document.getElementById('info-input').value.trim() || "Няма информация.";
-                    const avatar = document.getElementById('avatar-input').value.trim() || 'https://dicebear.com' + nickname;
-                    
-                    if(!nickname || !age) return alert("Попълнете никнейм и години!");
-
-                    // 1. Регистрация във Firebase Auth
+                    const info = document.getElementById('info-input').value.trim() || "Няма инфо.";
+                    if(!nickname || !age) return alert("Попълнете ник и години!");
                     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                    const user = userCredential.user;
-                    
-                    // Задаване на роля
                     const role = (email.toLowerCase() === 'admin@amoreclub.net') ? 'admin' : 'user';
-
-                    myProfile = { uid: user.uid, email, nickname, age, gender, info, avatar, role };
-
-                    // 2. Записване на профила в базата данни Firestore
-                    await setDoc(doc(db, "users", user.uid), myProfile);
-                    
+                    myProfile = { uid: userCredential.user.uid, email, nickname, age, gender, info, role };
+                    await setDoc(doc(db, "users", userCredential.user.uid), myProfile);
                 } else {
-                    // Логин
                     const userCredential = await signInWithEmailAndPassword(auth, email, password);
-                    const user = userCredential.user;
-                    
-                    // Взимане на допълнителните данни от Firestore
-                    const userDoc = await getDoc(doc(db, "users", user.uid));
-                    if(userDoc.exists()) {
-                        myProfile = userDoc.data();
-                    } else {
-                        myProfile = { nickname: user.email.split('@')[0], role: "user", age: "—", gender: "—", info: "Няма информация.", avatar: 'https://dicebear.comAmore' };
-                    }
+                    const userDoc = await getDoc(doc(db, "users", userCredential.user.uid));
+                    myProfile = userDoc.exists() ? userDoc.data() : { nickname: "Потребител", role: "user" };
                 }
-
-                // Преминаване към чата
                 document.getElementById('auth-screen').classList.add('hidden');
                 document.getElementById('chat-screen').classList.remove('hidden');
+                document.getElementById('chat-screen').style.display = 'flex';
                 document.getElementById('user-badge').innerText = `@${myProfile.nickname} (${myProfile.role})`;
-
-                // Свързване на потребителя със Socket.io сървъра
                 socket.emit('join-verified-user', myProfile);
-
-            } catch (error) {
-                alert("Възникна грешка: " + error.message);
-            }
+            } catch (error) { alert("Грешка: " + error.message); }
         }
 
         window.sendMessage = function() {
             const input = document.getElementById('message-input');
-            const msg = input.value.trim();
-            if(!msg) return;
-            socket.emit('chat-message', msg);
+            if(!input.value.trim()) return;
+            socket.emit('chat-message', input.value.trim());
             input.value = "";
         }
 
@@ -184,15 +123,13 @@
             const container = document.getElementById('messages-container');
             const msgDiv = document.createElement('div');
             const isMe = data.user === myProfile.nickname;
-
-            if(!isMe) document.getElementById('msg-sound').play().catch(()=>{});
-
-            msgDiv.className = `max-w-[75%] p-3.5 rounded-2xl text-sm ${
-                isMe ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white self-end rounded-tr-none shadow-lg shadow-purple-500/10' : 'bg-slate-800 text-slate-100 self-start rounded-tl-none border border-slate-700/40'
-            } ${data.role === 'admin' ? 'border-2 border-red-500 shadow-lg shadow-red-500/10' : ''}`;
-
-            msgDiv.innerHTML = `<button onclick="window.openProfileCard('${data.user}', '${data.role}')" class="block text-[10px] font-extrabold uppercase tracking-wider opacity-70 mb-1 hover:underline text-purple-300 text-left">${data.user} ${data.role==='admin'?'👑':''}</button>${data.text}`;
-            
+            msgDiv.style.padding = "10px";
+            msgDiv.style.borderRadius = "12px";
+            msgDiv.style.maxWidth = "70%";
+            msgDiv.style.background = isMe ? "linear-gradient(to right, #8b5cf6, #ec4899)" : "#1e293b";
+            msgDiv.style.alignSelf = isMe ? "flex-end" : "flex-start";
+            if(data.role === 'admin') msgDiv.style.border = "2px solid #ef4444";
+            msgDiv.innerHTML = `<strong style="font-size:10px; display:block; color:#c084fc;">${data.user}</strong>${data.text}`;
             container.appendChild(msgDiv);
             container.scrollTop = container.scrollHeight;
         });
@@ -200,44 +137,12 @@
         socket.on('system-message', (text) => {
             const container = document.getElementById('messages-container');
             const sysDiv = document.createElement('div');
-            sysDiv.className = "text-center text-xs text-purple-400/50 my-2 tracking-wide font-medium italic";
+            sysDiv.style.textAlign = "center";
+            sysDiv.style.fontSize = "12px";
+            sysDiv.style.color = "rgba(168,85,247,0.5)";
             sysDiv.innerText = text;
             container.appendChild(sysDiv);
             container.scrollTop = container.scrollHeight;
-        });
-
-        // Функция за отваряне на профил и админ бутони при клик на име
-        window.openProfileCard = async function(username, role) {
-            activeProfileView = username;
-            document.getElementById('modal-name').innerText = username + (role === 'admin' ? ' 👑 (Админ)' : '');
-            document.getElementById('modal-avatar').src = 'https://dicebear.com' + username;
-            
-            document.getElementById('modal-age').innerText = `Години: VIP Член`;
-            document.getElementById('modal-gender').innerText = `Пол: Скрит`;
-            document.getElementById('modal-info').innerText = `Потребител в стаята на Amore Club.`;
-
-            if(myProfile && myProfile.role === 'admin' && username !== myProfile.nickname) {
-                document.getElementById('admin-controls').classList.remove('hidden');
-            } else {
-                document.getElementById('admin-controls').classList.add('hidden');
-            }
-
-            document.getElementById('profile-modal').classList.remove('hidden');
-        }
-
-        window.closeProfile = function() {
-            document.getElementById('profile-modal').classList.add('hidden');
-        }
-
-        window.adminAction = function(action) {
-            if(!activeProfileView) return;
-            socket.emit('admin-action', { action: action, targetName: activeProfileView });
-            closeProfile();
-        }
-
-        socket.on('kick-user', () => {
-            alert("🚨 Бяхте изгонен или блокиран от Администратора!");
-            location.reload();
         });
     </script>
 </body>
