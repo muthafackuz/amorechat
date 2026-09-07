@@ -7,21 +7,17 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-// Парола за администратора (Можете да я смените тук)
 const ADMIN_PASSWORD = "moja-taina-parola";
 
-// Казваме на сървъра да показва HTML файла
+// ⚠️ ПРИНУДИТЕЛНО ЗАРЕЖДАНЕ НА ДИЗАЙНА НА НАЧАЛНА СТРАНИЦА
 app.get('/', (req, res) => {
-    res.sendFile(path.resolve(__dirname, 'index.html'));
+    res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-
-// Логика за комуникация в реално време
 io.on('connection', (socket) => {
     let username = "Анонимен";
     let isAdmin = false;
 
-    // Когато потребител влезе в чата
     socket.on('join', (name, password) => {
         username = name;
         if (name.toLowerCase() === 'admin' && password === ADMIN_PASSWORD) {
@@ -31,9 +27,7 @@ io.on('connection', (socket) => {
         io.emit('system-message', `${username} се присъедини към чата.`);
     });
 
-    // Когато пристигне ново съобщение
     socket.on('chat-message', (msg) => {
-        // Проверка за админ команди
         if (isAdmin && msg.startsWith('/kick ')) {
             const target = msg.replace('/kick ', '').trim();
             io.emit('kick-user', target);
@@ -41,7 +35,6 @@ io.on('connection', (socket) => {
             return;
         }
 
-        // Изпращане на съобщението до всички
         io.emit('broadcast-message', {
             user: username,
             text: msg,
@@ -49,14 +42,12 @@ io.on('connection', (socket) => {
         });
     });
 
-    // Когато някой затвори страницата
     socket.on('disconnect', () => {
         io.emit('system-message', `${username} напусна чата.`);
     });
 });
 
-// Порт за стартиране (Render ще подаде свой порт, локално е 3000)
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 10000;
 server.listen(PORT, () => {
     console.log(`Чатът работи на порт ${PORT}`);
 });
