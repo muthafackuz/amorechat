@@ -17,28 +17,24 @@
         #messages-container { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; background: rgba(2, 6, 17, 0.4); }
         .chat-bar { background: linear-gradient(to right, #581c87, #311042); padding: 15px; font-weight: bold; display: flex; justify-content: space-between; }
         .input-bar { padding: 15px; display: flex; gap: 10px; background: rgba(15, 23, 42, 0.5); }
+        .msg { padding: 10px; border-radius: 12px; max-width: 70%; }
     </style>
     <script src="/socket.io/socket.io.js"></script>
 </head>
 <body>
     <div id="auth-screen" class="box">
         <h2 id="auth-title">Amore Club</h2>
-        <p style="color:#94a3b8; font-size:12px; margin-bottom:20px;">Влез или се регистрирай в тайния чат</p>
-        <input id="email-input" type="email" placeholder="Имейл адрес...">
-        <input id="password-input" type="password" placeholder="Парола...">
-        <div id="register-fields" class="hidden">
-            <input id="nickname-input" type="text" placeholder="Потребителско име (Ник)...">
-            <input id="age-input" type="number" placeholder="Години...">
-            <select id="gender-input">
-                <option value="Мъж">Мъж 🧑</option>
-                <option value="Жена">Жена 👩</option>
-            </select>
-            <textarea id="info-input" placeholder="За мен..."></textarea>
-        </div>
-        <button id="main-auth-btn">Влизане</button>
-        <p style="font-size:12px; color:#94a3b8; margin-top:15px;">
-            <span id="switch-text">Нямаш профил?</span> <button id="switch-btn" style="background:none; border:none; color:#c084fc; width:auto; padding:0; display:inline; cursor:pointer; font-weight:bold;">Регистрирай се</button>
-        </p>
+        <p style="color:#94a3b8; font-size:12px; margin-bottom:20px;">Влез в тайния VIP чат</p>
+        
+        <input id="nickname-input" type="text" placeholder="Твоят никнейм (Име)...">
+        <input id="age-input" type="number" placeholder="Години...">
+        <select id="gender-input">
+            <option value="Мъж">Мъж 🧑</option>
+            <option value="Жена">Жена 👩</option>
+        </select>
+        <input id="admin-pass-input" type="password" placeholder="Админ парола (ако си шеф)...">
+        
+        <button id="main-auth-btn">Влизам в чата</button>
     </div>
 
     <div id="chat-screen" class="hidden">
@@ -52,75 +48,47 @@
             <button id="send-msg-btn" style="width:auto; padding:0 25px;">Прати</button>
         </div>
     </div>
-    <!-- Свързване на Firebase и автоматично задействане на бутоните -->
-    <script type="module">
-        import { initializeApp } from "https://gstatic.com";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://gstatic.com";
-        import { getFirestore, doc, setDoc, getDoc } from "https://gstatic.com";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyAECHxZNoWBbpx-eg1HvAGOfuOLSI4j4ho",
-            authDomain: "://firebaseapp.com",
-            projectId: "amorechat-77ecf",
-            storageBucket: "amorechat-77ecf.firebasestorage.app",
-            messagingSenderId: "830014963598",
-            appId: "1:830014963598:web:6117bdb8f952bb7cccaedf"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+    <script>
+        // Чист и сигурен код, който Render зарежда моментално
         const socket = io();
-        let isRegisterMode = false;
         let myProfile = null;
 
-        // Автоматично хващане на бутоните от кода, за да не замръзват никога
-        document.getElementById('switch-btn').addEventListener('click', () => {
-            isRegisterMode = !isRegisterMode;
-            document.getElementById('register-fields').classList.toggle('hidden', !isRegisterMode);
-            document.getElementById('auth-title').innerText = isRegisterMode ? 'Регистрация' : 'Amore Club';
-            document.getElementById('main-auth-btn').innerText = isRegisterMode ? 'Създай профил' : 'Влизане';
-            document.getElementById('switch-text').innerText = isRegisterMode ? 'Вече имаш профил?' : 'Нямаш профил?';
-            document.getElementById('switch-btn').innerText = isRegisterMode ? 'Влез оттук' : 'Регистрирай се';
-        });
+        // Парола за админ (Можеш да я смениш тук)
+        const ADMIN_PASSWORD = "moja-taina-parola";
 
-        document.getElementById('main-auth-btn').addEventListener('click', async () => {
-            const email = document.getElementById('email-input').value.trim();
-            const password = document.getElementById('password-input').value;
-            if(!email || !password) return alert("Попълнете полетата!");
-            
-            try {
-                if(isRegisterMode) {
-                    const nickname = document.getElementById('nickname-input').value.trim();
-                    const age = document.getElementById('age-input').value;
-                    const gender = document.getElementById('gender-input').value;
-                    const info = document.getElementById('info-input').value.trim() || "Няма инфо.";
-                    if(!nickname || !age) return alert("Попълнете ник и години!");
-                    
-                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                    const role = (email.toLowerCase() === 'admin@amoreclub.net') ? 'admin' : 'user';
-                    myProfile = { uid: userCredential.user.uid, email, nickname, age, gender, info, role };
-                    await setDoc(doc(db, "users", userCredential.user.uid), myProfile);
-                } else {
-                    const userCredential = await signInWithEmailAndPassword(auth, email, password);
-                    const userDoc = await getDoc(doc(db, "users", userCredential.user.uid));
-                    myProfile = userDoc.exists() ? userDoc.data() : { nickname: "Потребител", role: "user" };
-                }
-                
-                document.getElementById('auth-screen').classList.add('hidden');
-                document.getElementById('chat-screen').classList.remove('hidden');
-                document.getElementById('chat-screen').style.display = 'flex';
-                document.getElementById('user-badge').innerText = `@${myProfile.nickname} (${myProfile.role})`;
-                socket.emit('join-verified-user', myProfile);
-            } catch (error) { 
-                alert("Грешка: " + error.message); 
+        document.getElementById('main-auth-btn').addEventListener('click', () => {
+            const nickname = document.getElementById('nickname-input').value.trim();
+            const age = document.getElementById('age-input').value;
+            const gender = document.getElementById('gender-input').value;
+            const adminPass = document.getElementById('admin-pass-input').value;
+
+            if(!nickname || !age) return alert("Моля, въведете име и години!");
+
+            // Автоматична проверка за ранг админ през паролата
+            let role = "user";
+            if((nickname.toLowerCase() === 'admin' || nickname.toLowerCase() === 'pavel') && adminPass === ADMIN_PASSWORD) {
+                role = "admin";
             }
+
+            myProfile = { nickname, age, gender, role };
+
+            // Скриваме входа и показваме чата
+            document.getElementById('auth-screen').classList.add('hidden');
+            document.getElementById('chat-screen').classList.remove('hidden');
+            document.getElementById('chat-screen').style.display = 'flex';
+            
+            document.getElementById('user-badge').innerText = `@${nickname} (${role === 'admin' ? '👑 Администратор' : 'VIP член'})`;
+
+            // Уведомяваме сървъра, че влизаме
+            socket.emit('join-verified-user', myProfile);
         });
 
         const doSendMessage = () => {
             const input = document.getElementById('message-input');
-            if(!input.value.trim()) return;
-            socket.emit('chat-message', input.value.trim());
+            const msg = input.value.trim();
+            if(!msg) return;
+
+            socket.emit('chat-message', msg);
             input.value = "";
         };
 
@@ -133,13 +101,17 @@
             const container = document.getElementById('messages-container');
             const msgDiv = document.createElement('div');
             const isMe = data.user === myProfile.nickname;
-            msgDiv.style.padding = "10px";
-            msgDiv.style.borderRadius = "12px";
-            msgDiv.style.maxWidth = "70%";
+
+            msgDiv.className = "msg";
             msgDiv.style.background = isMe ? "linear-gradient(to right, #8b5cf6, #ec4899)" : "#1e293b";
             msgDiv.style.alignSelf = isMe ? "flex-end" : "flex-start";
-            if(data.role === 'admin') msgDiv.style.border = "2px solid #ef4444";
-            msgDiv.innerHTML = `<strong style="font-size:10px; display:block; color:#c084fc;">${data.user}</strong>${data.text}`;
+            
+            if(data.role === 'admin') {
+                msgDiv.style.border = "2px solid #ef4444";
+                msgDiv.style.boxShadow = "0 0 10px rgba(239, 68, 68, 0.3)";
+            }
+
+            msgDiv.innerHTML = `<strong style="font-size:10px; display:block; color:#c084fc; margin-bottom:4px;">${data.user} ${data.role === 'admin' ? '👑' : ''}</strong>${data.text}`;
             container.appendChild(msgDiv);
             container.scrollTop = container.scrollHeight;
         });
@@ -150,9 +122,15 @@
             sysDiv.style.textAlign = "center";
             sysDiv.style.fontSize = "12px";
             sysDiv.style.color = "rgba(168,85,247,0.5)";
+            sysDiv.style.margin = "5px 0";
             sysDiv.innerText = text;
             container.appendChild(sysDiv);
             container.scrollTop = container.scrollHeight;
+        });
+
+        socket.on('kick-user', () => {
+            alert("🚨 Бяхте изгонен от стаята от Администратора!");
+            location.reload();
         });
     </script>
 </body>
