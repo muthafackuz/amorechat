@@ -27,13 +27,12 @@ io.on('connection', (socket) => {
         const cleanEmail = email ? email.toLowerCase().trim() : "";
         const cleanNickname = nickname ? nickname.trim() : "";
 
-        // 🚨 ЖЕЛЕЗНА ПРОВЕРКА ЗА БАН (Спира влизането веднага)
+        // 🚨 ПРОВЕРКА ЗА БАН
         if (bannedUsers.has(cleanEmail) || bannedUsers.has(cleanNickname.toLowerCase())) {
             return socket.emit('auth-error', '🚫 Вие имате постоянен БАН от Amore Club и не можете да влезете!');
         }
 
         if (isRegister) {
-            // Проверка дали потребителят вече съществува в базата ни данни
             let existingUser = null;
             for (let uid in usersDB) {
                 if (usersDB[uid].email === cleanEmail || usersDB[uid].nickname.toLowerCase() === cleanNickname.toLowerCase()) {
@@ -42,7 +41,6 @@ io.on('connection', (socket) => {
                 }
             }
 
-            // Уловка: Ако браузърът презарежда автоматично съществуващ потребител, го логваме вместо нова регистрация
             if (existingUser) {
                 currentNickname = existingUser.nickname;
                 currentRole = existingUser.role;
@@ -52,7 +50,6 @@ io.on('connection', (socket) => {
                 return;
             }
 
-            // Истинска нова регистрация
             const uid = "_" + Math.random().toString(36).substr(2, 9);
             const role = (cleanEmail === 'admin@amoreclub.net' || cleanNickname.toLowerCase() === 'admin' || cleanNickname.toLowerCase() === 'pavel') ? 'admin' : 'user';
 
@@ -66,7 +63,6 @@ io.on('connection', (socket) => {
             socket.emit('auth-success', newProfile);
             io.emit('system-message', `🎉 Нов регистриран член в клуба: ${currentNickname}!`);
         } else {
-            // Нормален Вход
             let foundUser = null;
             for (let uid in usersDB) {
                 if (usersDB[uid].email === cleanEmail && usersDB[uid].password === password) {
@@ -104,10 +100,33 @@ io.on('connection', (socket) => {
             }
 
             if (msg.startsWith('/unban ')) {
-                const target = msg.replace('/unban ', '').trim().toLowerCase();
-                if (bannedUsers.has(target)) {
-                    bannedUsers.delete(target);
-                    io.emit('system-message', `🔓 Потребителят ${target} беше амнистиран и банът му беше премахнат.`);
+                const target = msg.replace('/unban ', '').trim();
+                const targetLower = target.toLowerCase();
+                
+                let unbannedSomething = false;
+
+                // 1. Махаме никнейма от списъка с банове
+                if (bannedUsers.has(targetLower)) {
+                    bannedUsers.delete(targetLower);
+                    unbannedSomething = true;
+                }
+
+                // 2. Намираме имейла на този потребител и го махаме също от списъка с банове
+                for (let uid in usersDB) {
+                    if (usersDB[uid].nickname.toLowerCase() === targetLower) {
+                        const userEmail = usersDB[uid].email.toLowerCase();
+                        if (bannedUsers.has(userEmail)) {
+                            bannedUsers.delete(userEmail);
+                            unbannedSomething = true;
+                        }
+                        break;
+                    }
+                }
+
+                if (unbannedSomething) {
+                    io.emit('system-message', `🔓 Потребителят ${target} беше напълно амнистиран и неговият имейл и никнейм бяха отблокирани.`);
+                } else {
+                    socket.emit('system-message', `❌ Потребителят ${target} не беше намерен в списъка с активни банове.`);
                 }
                 return;
             }
@@ -149,10 +168,8 @@ io.on('connection', (socket) => {
             mutedUsers.add(targetName);
             io.emit('system-message', `🔇 Потребителят ${targetName} беше заглушен.`);
         } else if (action === 'ban') {
-            // 🚨 НАКАЗАНИЕТО: Записваме името му в черния списък с малки букви
             bannedUsers.add(targetName.toLowerCase());
             
-            // Намираме и имейла му от базата, за да баннем и него за сигурност
             for (let uid in usersDB) {
                 if (usersDB[uid].nickname === targetName) {
                     bannedUsers.add(usersDB[uid].email.toLowerCase());
@@ -160,7 +177,7 @@ io.on('connection', (socket) => {
                 }
             }
 
-            io.emit('system-message', `🚫 Потребителят ${targetName} получи ПОСТОЯНЕН БАН от клуба!`);
+            io.emit('system-message', `🚫 Потребителят ${targetName} получил ПОСТОЯНЕН БАН от клуба!`);
             if (targetSocket) targetSocket.emit('kick-user');
         }
     });
