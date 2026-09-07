@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Amore Club</title>
     <style>
-        /* 🪩 ДИСКОТЕЧНИ СВЕТЛИНИ (Градиентна анимация в реално време) */
+        /* 🪩 ДИСКОТЕЧНА ЛЕНТА */
         @keyframes discoLights {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
@@ -16,13 +16,46 @@
             top: 0;
             left: 0;
             width: 100%;
-            height: 36px;
+            height: 6px;
             background: linear-gradient(90deg, #9333ea, #ec4899, #3b82f6, #06b6d4, #9333ea);
             background-size: 400% 400%;
             animation: discoLights 4s linear infinite;
             box-shadow: 0 0 20px #ec4899, 0 0 40px #9333ea;
             z-index: 999;
         }
+
+        /* 🔊 АНИМАЦИЯ ЗА ТУПКАЩ БАС */
+        @keyframes bassThump {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 15px rgba(168, 85, 247, 0.4); }
+            35% { transform: scale(1.12); box-shadow: 0 0 35px #ec4899, 0 0 60px #9333ea; }
+            50% { transform: scale(1.05); }
+            70% { transform: scale(1.15); box-shadow: 0 0 40px #06b6d4, 0 0 70px #3b82f6; }
+        }
+
+        .speaker {
+            position: fixed;
+            top: 15px;
+            width: 70px;
+            height: 110px;
+            background: #090d16;
+            border: 3px solid #1e293b;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-around;
+            padding: 8px 0;
+            box-sizing: border-box;
+            animation: bassThump 1.2s ease-in-out infinite;
+            z-index: 1000;
+        }
+        .speaker-left { left: 20px; }
+        .speaker-right { right: 20px; }
+
+        /* Динамика на говорителите вътре в колоната */
+        .tweeter { width: 30px; height: 30px; background: #1e293b; border: 2px solid #a855f7; border-radius: 50%; }
+        .subwoofer { width: 50px; height: 50px; background: #111827; border: 3px solid #ec4899; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .sub-center { width: 18px; height: 18px; background: #374151; border-radius: 50%; }
 
         body { background: linear-gradient(135deg, #020617, #3b0764, #020617); min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: sans-serif; color: #f8fafc; margin: 0; padding: 20px; box-sizing: border-box; }
         .box { background: rgba(15, 23, 42, 0.9); padding: 30px; border-radius: 24px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); width: 100%; max-width: 400px; border: 1px solid rgba(168, 85, 247, 0.2); text-align: center; }
@@ -34,7 +67,7 @@
         .hidden { display: none !important; }
         #chat-screen { width: 100%; max-width: 900px; height: 85vh; background: rgba(15, 23, 42, 0.9); border-radius: 24px; border: 1px solid rgba(168, 85, 247, 0.2); display: flex; flex-direction: column; overflow: hidden; }
         #messages-container { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; background: rgba(2, 6, 17, 0.4); }
-        .chat-bar { background: linear-gradient(to right, #581c87, #311042); padding: 15px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(168, 85, 247, 0.2); }
+        .chat-bar { background: linear-gradient(to right, #581c87, #311042); padding: 15px 100px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(168, 85, 247, 0.2); }
         .input-bar { padding: 15px; display: flex; gap: 10px; background: rgba(15, 23, 42, 0.5); border-top: 1px solid rgba(168, 85, 247, 0.1); }
         .msg { padding: 12px; border-radius: 16px; max-width: 70%; line-height: 1.4; }
         .modal { display: flex; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.6); align-items: center; justify-content: center; padding: 20px; z-index: 100; }
@@ -43,8 +76,18 @@
     <script src="/socket.io/socket.io.js"></script>
 </head>
 <body>
-    <!-- Лентата със светлините -->
+    <!-- Парти лента -->
     <div class="disco-bar"></div>
+
+    <!-- ТУПКАЩИ КОЛОНИ -->
+    <div class="speaker speaker-left">
+        <div class="tweeter"></div>
+        <div class="subwoofer"><div class="sub-center"></div></div>
+    </div>
+    <div class="speaker speaker-right">
+        <div class="tweeter"></div>
+        <div class="subwoofer"><div class="sub-center"></div></div>
+    </div>
     <!-- ЕКРАН ЗА ВХОД И РЕГИСТРАЦИЯ -->
     <div id="auth-screen" class="box">
         <h2 id="auth-title">Amore Club</h2>
@@ -59,22 +102,22 @@
             <select id="gender-input">
                 <option value="Мъж">Мъж 🧑</option>
                 <option value="Жена">Жена 👩</option>
+                <option value="Друго">Друго 🤫</option>
             </select>
             <textarea id="info-input" placeholder="Кратко инфо за мен..." style="height: 70px; resize: none;"></textarea>
         </div>
         
-        <button id="main-auth-btn">Влез</button>
+        <button id="main-auth-btn">Влизане</button>
         <p style="font-size:12px; color:#94a3b8; margin-top:15px;">
             <span id="switch-text">Нямаш профил?</span> 
-            <button id="switch-btn" style="background:none; border:none; color:#c084fc; font-weight:bold; cursor:pointer; padding:0; display:inline;">Регистрирай се от тук</button>
+            <button id="switch-btn" style="background:none; border:none; color:#c084fc; font-weight:bold; cursor:pointer; padding:0; display:inline;">Регистрирай се тук</button>
         </p>
     </div>
 
     <!-- ОСНОВЕН ЕКРАН НА ЧАТ СТАЯТА -->
-     <h1><center><b>САЙТА Е В ПРОЦЕС НА РАЗРАБОТКА!</b></center></h1>
     <div id="chat-screen" class="hidden">
         <div class="chat-bar">
-            <span>🔮 AmoreClub ЧАТ</span>
+            <span>🔮 Amore VIP Chat Room</span>
             <div style="display: flex; align-items: center; gap: 10px;">
                 <span id="user-badge" style="font-size:12px; background:rgba(168,85,247,0.2); padding:5px 12px; border-radius:12px; color:#c084fc;"></span>
                 <button id="logout-btn" style="width: auto; padding: 6px 14px; background: #ef4444; font-size: 11px; border-radius: 8px;">Изход</button>
@@ -83,7 +126,7 @@
         <div id="messages-container"></div>
         <div class="input-bar">
             <input id="message-input" type="text" placeholder="Напиши съобщение..." style="margin:0; flex:1;">
-            <button id="send-msg-btn" style="width:auto; padding:0 30px;">Изпрати</button>
+            <button id="send-msg-btn" style="width:auto; padding:0 30px;">Прати</button>
         </div>
     </div>
 
@@ -134,7 +177,7 @@
         document.getElementById('main-auth-btn').addEventListener('click', () => {
             const email = document.getElementById('email-input').value.trim();
             const password = document.getElementById('password-input').value;
-            if(!email || !password) return alert("Попълнете имейл и парола! :)");
+            if(!email || !password) return alert("Попълнете имейл и парола!");
 
             const data = { email, password, isRegister: isRegisterMode };
             if(isRegisterMode) {
@@ -142,7 +185,7 @@
                 data.age = document.getElementById('age-input').value;
                 data.gender = document.getElementById('gender-input').value;
                 data.info = document.getElementById('info-input').value.trim();
-                if(!data.nickname || !data.age) return alert("Попълнете никнейм и години! :)");
+                if(!data.nickname || !data.age) return alert("Попълнете никнейм и години!");
             }
             socket.emit('auth-action', data);
         });
@@ -217,7 +260,7 @@
             container.appendChild(d); container.scrollTop = container.scrollHeight;
         });
 
-        socket.on('kick-user', () => { alert("🚨 Бяхте изгонен от Администратора! :)"); location.reload(); });
+        socket.on('kick-user', () => { alert("🚨 Бяхте изгонен от Администратора!"); location.reload(); });
     </script>
 </body>
 </html>
