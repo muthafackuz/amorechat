@@ -1,271 +1,213 @@
 <!DOCTYPE html>
 <html lang="bg">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Amore Club</title>
-    <style>
-        /* 🪩 ДИСКОТЕЧНА ЛЕНТА */
-        @keyframes discoLights {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-        .disco-bar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 36px;
-            background: linear-gradient(90deg, #9333ea, #ec4899, #3b82f6, #06b6d4, #9333ea);
-            background-size: 400% 400%;
-            animation: discoLights 4s linear infinite;
-            box-shadow: 0 0 20px #ec4899, 0 0 40px #9333ea;
-            z-index: 999;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BG Перли & Травел Калкулатор</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --accent: #10b981;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+    }
 
-        /* 🔊 АНИМАЦИЯ ЗА ТУПКАЩ БАС */
-        @keyframes bassThump {
-            0%, 100% { transform: scale(1); box-shadow: 0 0 15px rgba(168, 85, 247, 0.4); }
-            35% { transform: scale(1.12); box-shadow: 0 0 35px #ec4899, 0 0 60px #9333ea; }
-            50% { transform: scale(1.05); }
-            70% { transform: scale(1.15); box-shadow: 0 0 40px #06b6d4, 0 0 70px #3b82f6; }
-        }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 0;
+    }
 
-        .speaker {
-            position: fixed;
-            top: 105px;
-            width: 70px;
-            height: 110px;
-            background: #090d16;
-            border: 3px solid #1e293b;
-            border-radius: 12px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: space-around;
-            padding: 8px 0;
-            box-sizing: border-box;
-            animation: bassThump 1.2s ease-in-out infinite;
-            z-index: 1000;
-        }
-        .speaker-left { left: 30px; }
-        .speaker-right { right: 30px; }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.5rem 2rem;
+      background: #020617;
+      border-bottom: 1px solid #334155;
+    }
 
-        /* Динамика на говорителите вътре в колоната */
-        .tweeter { width: 30px; height: 30px; background: #1e293b; border: 2px solid #a855f7; border-radius: 50%; }
-        .subwoofer { width: 50px; height: 50px; background: #111827; border: 3px solid #ec4899; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-        .sub-center { width: 18px; height: 18px; background: #374151; border-radius: 50%; }
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--accent);
+    }
 
-        body { background: linear-gradient(135deg, #020617, #3b0764, #020617); min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: sans-serif; color: #f8fafc; margin: 0; padding: 20px; box-sizing: border-box; }
-        .box { background: rgba(15, 23, 42, 0.9); padding: 30px; border-radius: 24px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); width: 100%; max-width: 400px; border: 1px solid rgba(168, 85, 247, 0.2); text-align: center; }
-        h2 { font-size: 2rem; margin: 0 0 10px 0; background: linear-gradient(to right, #c084fc, #db2777); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        input, select, textarea { width: 100%; padding: 12px; background: rgba(30, 41, 59, 0.5); border: 1px solid #334155; border-radius: 12px; color: white; margin-bottom: 12px; box-sizing: border-box; }
-        input:focus { border-color: #a855f7; outline: none; }
-        button { width: 100%; padding: 14px; background: linear-gradient(to right, #9333ea, #db2777); border: none; border-radius: 12px; color: white; font-weight: bold; cursor: pointer; font-size: 1rem; }
-        button:hover { opacity: 0.9; }
-        .hidden { display: none !important; }
-        #chat-screen { width: 100%; max-width: 900px; height: 85vh; background: rgba(15, 23, 42, 0.9); border-radius: 24px; border: 1px solid rgba(168, 85, 247, 0.2); display: flex; flex-direction: column; overflow: hidden; }
-        #messages-container { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; background: rgba(2, 6, 17, 0.4); }
-        .chat-bar { background: linear-gradient(to right, #581c87, #311042); padding: 15px 100px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(168, 85, 247, 0.2); }
-        .input-bar { padding: 15px; display: flex; gap: 10px; background: rgba(15, 23, 42, 0.5); border-top: 1px solid rgba(168, 85, 247, 0.1); }
-        .msg { padding: 12px; border-radius: 16px; max-width: 70%; line-height: 1.4; }
-        .modal { display: flex; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.6); align-items: center; justify-content: center; padding: 20px; z-index: 100; }
-        .modal-box { background: #0f172a; padding: 25px; border-radius: 24px; border: 1px solid rgba(168, 85, 247, 0.3); text-align: center; width: 100%; max-width: 350px; position: relative; }
-    </style>
-    <script src="/socket.io/socket.io.js"></script>
+    nav a {
+      color: var(--text);
+      text-decoration: none;
+      margin-left: 1.5rem;
+      font-weight: 500;
+    }
+
+    nav a.highlight {
+      background: var(--accent);
+      color: #000;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      border: 1px solid #334155;
+    }
+
+    .destination-img {
+      width: 100%;
+      height: 300px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+
+    .calculator {
+      background: #020617;
+      border: 1px solid var(--accent);
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin-top: 1.5rem;
+    }
+
+    .calculator h3 {
+      margin-top: 0;
+      color: var(--accent);
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    label {
+      display: block;
+      font-size: 0.9rem;
+      margin-bottom: 0.3rem;
+      color: var(--text-muted);
+    }
+
+    input {
+      width: 100%;
+      padding: 0.6rem;
+      background: #1e293b;
+      border: 1px solid #475569;
+      color: white;
+      border-radius: 6px;
+      box-sizing: border-box;
+    }
+
+    .result {
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin-top: 1rem;
+      padding: 1rem;
+      background: #064e3b;
+      border-radius: 6px;
+      text-align: center;
+    }
+
+    .affiliate-btn {
+      display: block;
+      width: 100%;
+      text-align: center;
+      background: #2563eb;
+      color: white;
+      text-decoration: none;
+      padding: 0.8rem;
+      border-radius: 6px;
+      margin-top: 1rem;
+      font-weight: bold;
+    }
+  </style>
 </head>
 <body>
-    <!-- Парти лента -->
-    <div class="disco-bar"></div>
 
-    <!-- ТУПКАЩИ КОЛОНИ -->
-    <div class="speaker speaker-left">
-        <div class="tweeter"></div>
-        <div class="subwoofer"><div class="sub-center"></div></div>
-    </div>
-    <div class="speaker speaker-right">
-        <div class="tweeter"></div>
-        <div class="subwoofer"><div class="sub-center"></div></div>
-    </div>
-    
-    <!-- ЕКРАН ЗА ВХОД И РЕГИСТРАЦИЯ -->
-    <div id="auth-screen" class="box">
-        <h2 id="auth-title">Amore Club</h2>
-        <p id="auth-subtitle" style="color:#94a3b8; font-size:12px; margin-bottom:20px;">Влез в своя профил или се регистрирай</p>
+  <header>
+    <div class="logo">BGПерли 🌲</div>
+    <nav>
+      <a href="#">Дестинации</a>
+      <a href="#" class="highlight">Калкулатор Заплата</a>
+    </nav>
+  </header>
+
+  <div class="container">
+    <div class="card">
+      <h2>1. Вазовска Екопътека и водопад Скакля</h2>
+      <p style="color: var(--text-muted);">Искърско дефиле • На 1 час от София</p>
+      
+      <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800" alt="Водопад" class="destination-img">
+      
+      <p>Една от най-красивите и лесни за преход маршрути около София. Пътеката крие живописни гледки към дефилето и завършва с един от най-високите водопади в България.</p>
+
+      <!-- Интегриран Калкулатор за Разход -->
+      <div class="calculator">
+        <h3>🚗 Изчисли колко ще ти струва това пътуване</h3>
         
-        <input id="email-input" type="email" placeholder="Имейл адрес...">
-        <input id="password-input" type="password" placeholder="Парола...">
-        
-        <div id="register-fields" class="hidden">
-            <input id="nickname-input" type="text" placeholder="Потребителско име (Ник)...">
-            <input id="age-input" type="number" placeholder="Години...">
-            <select id="gender-input">
-                <option value="Мъж">Мъж 🧑</option>
-                <option value="Жена">Жена 👩</option>
-            </select>
-            <textarea id="info-input" placeholder="Кратко инфо за мен..." style="height: 70px; resize: none;"></textarea>
+        <div class="form-group">
+          <label>Разстояние в двете посоки (км):</label>
+          <input type="number" id="distance" value="120">
         </div>
-        
-        <button id="main-auth-btn">Влизане</button>
-        <p style="font-size:12px; color:#94a3b8; margin-top:15px;">
-            <span id="switch-text">Нямаш профил?</span> 
-            <button id="switch-btn" style="background:none; border:none; color:#c084fc; font-weight:bold; cursor:pointer; padding:0; display:inline;">Регистрирай се тук</button>
-        </p>
+
+        <div class="form-group">
+          <label>Разход на колата (л/100км):</label>
+          <input type="number" id="consumption" value="7" step="0.1">
+        </div>
+
+        <div class="form-group">
+          <label>Цена на горивото (лв/литър):</label>
+          <input type="number" id="price" value="2.65" step="0.01">
+        </div>
+
+        <div class="form-group">
+          <label>Брой хора в колата:</label>
+          <input type="number" id="people" value="3">
+        </div>
+
+        <div class="result" id="totalResult">
+          Общо за гориво: 22.26 лв. (7.42 лв. на човек)
+        </div>
+
+        <!-- Афилиейт линк за монетизация -->
+        <a href="https://www.booking.com" target="_blank" class="affiliate-btn">
+          🏨 Намери евтина къща за гости наблизо
+        </a>
+      </div>
     </div>
- <h1><b><color='red';>САЙТА Е В ПРОЦЕС НА РАЗРАБОТКА! :)</color></b></h1>
-    <!-- ОСНОВЕН ЕКРАН НА ЧАТ СТАЯТА -->
-    <div id="chat-screen" class="hidden">
-        <div class="chat-bar">
-            <span>🔮 AmoreClub ЧАТ</span>
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <span id="user-badge" style="font-size:12px; background:rgba(168,85,247,0.2); padding:5px 12px; border-radius:12px; color:#c084fc;"></span>
-                <button id="logout-btn" style="width: auto; padding: 6px 14px; background: #ef4444; font-size: 11px; border-radius: 8px;">Изход</button>
-            </div>
-        </div>
-        <div id="messages-container">
-            <div class="msg" style="background: linear-gradient(to right, rgb(139, 92, 246), rgb(236, 72, 153)); align-self: flex-end; border: 2px solid rgb(239, 68, 68);"><button onclick="viewProfile('Admin')" style="background:none; border:none; padding:0; color:#c084fc; font-weight:bold; font-size:11px; cursor:pointer; display:block; text-align:left; margin-bottom:4px; hover:underline;">Admin 👑</button>Здравейте! Това съобщение е автоматично! Сайта е в процес на разработка и няма нищо общо с това,което виждате в момента. Това е временна страница, в която можете да си пишете. Желая ви страхотен ден и се надявам скоро да се видим в новата ни онлайн дискотека! :)</div>
-        </div>
-        <div class="input-bar">
-            <input id="message-input" type="text" placeholder="Напиши съобщение..." style="margin:0; flex:1;">
-            <button id="send-msg-btn" style="width:auto; padding:0 30px;">Прати</button>
-        </div>
-    </div>
-     <script type="text/javascript" src="https://www.free-counters.org/count/k73u"></script><br>
- <a href='http://www.counter-zaehler.de'>Брояч на посещения</a> <script type='text/javascript' src='https://www.whomania.com/ctr?id=dc221adbe15b3cf449095f0f01668055f82d7819'></script>
-    
-    
-    <!-- ПОП-ЪП КАРТА ЗА ПРЕГЛЕД НА ПРОФИЛИ И АДМИН ПАНЕЛ -->
-    <div id="profile-modal" class="modal hidden">
-        <div class="modal-box">
-            <button onclick="document.getElementById('profile-modal').classList.add('hidden')" style="position:absolute; top:15px; right:15px; background:none; border:none; color:#94a3b8; font-size:18px; cursor:pointer; width:auto; padding:0;">✕</button>
-            <div style="font-size: 50px; margin-bottom: 10px;">👤</div>
-            <h3 id="modal-name" style="margin:0 0 5px 0; font-size:22px;"></h3>
-            <p id="modal-meta" style="color:#94a3b8; font-size:13px; margin:0 0 15px 0;"></p>
-            <p id="modal-info" style="background:rgba(2,6,17,0.6); padding:12px; border-radius:12px; font-size:14px; font-style:italic; text-align:left; border:1px solid #1e293b; color:#cbd5e1;"></p>
-            
-            <!-- СКРИТ АДМИН КУФАР С ИНСТРУМЕНТИ -->
-            <div id="admin-controls" class="hidden" style="border-top:1px solid #1e293b; margin-top:20px; padding-top:15px;">
-                <p style="font-size:10px; color:#f87171; font-weight:bold; margin:0 0 10px 0; text-transform:uppercase;">👮 Админ Контрол</p>
-                <div style="display:flex; gap:8px;">
-                    <button id="kick-btn" style="background:rgba(245,158,11,0.2); color:#fbbf24; padding:8px 0; font-size:12px;">Kick</button>
-                    <button id="mute-btn" style="background:rgba(249,115,22,0.2); color:#fdba74; padding:8px 0; font-size:12px;">Mute</button>
-                    <button id="ban-btn" style="background:#dc2626; padding:8px 0; font-size:12px;">BAN</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <script>
-        const socket = io();
-        let isRegisterMode = false;
-        let myProfile = null;
-        let selectedUserForAdmin = "";
+  </div>
 
-        // Автоматично логване от паметта на браузъра при рестарт на сървъра
-        const saved = localStorage.getItem('amore_user');
-        if(saved) {
-            try {
-                myProfile = JSON.parse(saved);
-                socket.emit('auth-action', { ...myProfile, isRegister: true }); 
-            } catch(e) { localStorage.removeItem('amore_user'); }
-        }
+  <script>
+    const distanceInput = document.getElementById('distance');
+    const consumptionInput = document.getElementById('consumption');
+    const priceInput = document.getElementById('price');
+    const peopleInput = document.getElementById('people');
+    const resultDiv = document.getElementById('totalResult');
 
-        document.getElementById('switch-btn').addEventListener('click', () => {
-            isRegisterMode = !isRegisterMode;
-            document.getElementById('register-fields').classList.toggle('hidden', !isRegisterMode);
-            document.getElementById('auth-title').innerText = isRegisterMode ? 'Регистрация' : 'Amore Club';
-            document.getElementById('main-auth-btn').innerText = isRegisterMode ? 'Създай профил' : 'Влизане';
-            document.getElementById('switch-text').innerText = isRegisterMode ? 'Вече имаш профил?' : 'Нямаш профил?';
-            document.getElementById('switch-btn').innerText = isRegisterMode ? 'Влез оттук' : 'Регистрирай се тук';
-        });
+    function calculateFuel() {
+      const dist = parseFloat(distanceInput.value) || 0;
+      const cons = parseFloat(consumptionInput.value) || 0;
+      const price = parseFloat(priceInput.value) || 0;
+      const people = parseInt(peopleInput.value) || 1;
 
-        document.getElementById('main-auth-btn').addEventListener('click', () => {
-            const email = document.getElementById('email-input').value.trim();
-            const password = document.getElementById('password-input').value;
-            if(!email || !password) return alert("Попълнете имейл и парола!");
+      const totalLiters = (dist / 100) * cons;
+      const totalCost = totalLiters * price;
+      const costPerPerson = totalCost / people;
 
-            const data = { email, password, isRegister: isRegisterMode };
-            if(isRegisterMode) {
-                data.nickname = document.getElementById('nickname-input').value.trim();
-                data.age = document.getElementById('age-input').value;
-                data.gender = document.getElementById('gender-input').value;
-                data.info = document.getElementById('info-input').value.trim();
-                if(!data.nickname || !data.age) return alert("Попълнете никнейм и години!");
-            }
-            socket.emit('auth-action', data);
-        });
+      resultDiv.innerHTML = `Общо за гориво: ${totalCost.toFixed(2)} лв. (${costPerPerson.toFixed(2)} лв. на човек)`;
+    }
 
-        socket.on('auth-success', (profile) => {
-            myProfile = profile;
-            localStorage.setItem('amore_user', JSON.stringify({ email: profile.email, password: profile.password, nickname: profile.nickname, age: profile.age, gender: profile.gender, info: profile.info }));
-            
-            document.getElementById('auth-screen').classList.add('hidden');
-            document.getElementById('chat-screen').classList.remove('hidden');
-            document.getElementById('chat-screen').style.display = 'flex';
-            document.getElementById('user-badge').innerText = `@${profile.nickname} (${profile.role === 'admin' ? 'Админ' : 'VIP'})`;
-        });
-
-        socket.on('auth-error', (msg) => alert(msg));
-
-        document.getElementById('logout-btn').addEventListener('click', () => {
-            localStorage.removeItem('amore_user');
-            location.reload();
-        });
-
-        const sendMsg = () => {
-            const input = document.getElementById('message-input');
-            if(!input.value.trim()) return;
-            socket.emit('chat-message', input.value.trim());
-            input.value = "";
-        };
-        document.getElementById('send-msg-btn').addEventListener('click', sendMsg);
-        document.getElementById('message-input').addEventListener('keypress', (e) => { if(e.key==='Enter') sendMsg(); });
-
-        socket.on('broadcast-message', (data) => {
-            const container = document.getElementById('messages-container');
-            const msgDiv = document.createElement('div');
-            const isMe = data.user === myProfile.nickname;
-
-            msgDiv.className = "msg";
-            msgDiv.style.background = isMe ? "linear-gradient(to right, #8b5cf6, #ec4899)" : "#1e293b";
-            msgDiv.style.alignSelf = isMe ? "flex-end" : "flex-start";
-            if(data.role === 'admin') msgDiv.style.border = "2px solid #ef4444";
-
-            msgDiv.innerHTML = `<button onclick="viewProfile('${data.user}')" style="background:none; border:none; padding:0; color:#c084fc; font-weight:bold; font-size:11px; cursor:pointer; display:block; text-align:left; margin-bottom:4px; hover:underline;">${data.user} ${data.role==='admin'?'👑':''}</button>${data.text}`;
-            container.appendChild(msgDiv);
-            container.scrollTop = container.scrollHeight;
-        });
-
-        window.viewProfile = (name) => {
-            selectedUserForAdmin = name;
-            socket.emit('get-user-profile', name);
-        };
-
-        socket.on('receive-user-profile', (p) => {
-            document.getElementById('modal-name').innerText = p.nickname + (p.role === 'admin' ? ' 👑' : '');
-            document.getElementById('modal-meta').innerText = `Години: ${p.age} | Пол: ${p.gender}`;
-            document.getElementById('modal-info').innerText = p.info || "Няма споделено инфо.";
-
-            if(myProfile && myProfile.role === 'admin' && p.nickname !== myProfile.nickname) {
-                document.getElementById('admin-controls').classList.remove('hidden');
-            } else {
-                document.getElementById('admin-controls').classList.add('hidden');
-            }
-            document.getElementById('profile-modal').classList.remove('hidden');
-        });
-
-        document.getElementById('kick-btn').addEventListener('click', () => { socket.emit('admin-action', { action: 'kick', targetName: selectedUserForAdmin }); document.getElementById('profile-modal').classList.add('hidden'); });
-        document.getElementById('mute-btn').addEventListener('click', () => { socket.emit('admin-action', { action: 'mute', targetName: selectedUserForAdmin }); document.getElementById('profile-modal').classList.add('hidden'); });
-        document.getElementById('ban-btn').addEventListener('click', () => { socket.emit('admin-action', { action: 'ban', targetName: selectedUserForAdmin }); document.getElementById('profile-modal').classList.add('hidden'); });
-
-        socket.on('system-message', (t) => {
-            const container = document.getElementById('messages-container');
-            const d = document.createElement('div');
-            d.style.textAlign="center"; d.style.fontSize="12px"; d.style.color="rgba(168,85,247,0.5)"; d.innerText=t;
-            container.appendChild(d); container.scrollTop = container.scrollHeight;
-        });
-
-        socket.on('kick-user', () => { alert("🚨 Бяхте изгонен от Администратора!"); location.reload(); });
-    </script>
+    distanceInput.addEventListener('input', calculateFuel);
+    consumptionInput.addEventListener('input', calculateFuel);
+    priceInput.addEventListener('input', calculateFuel);
+    peopleInput.addEventListener('input', calculateFuel);
+  </script>
 </body>
 </html>
