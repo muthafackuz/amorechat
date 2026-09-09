@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Калкулатор Заплата (Чисто / Бруто) - BGПерли & Финанси</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --accent: #10b981;
+      --accent-hover: #059669;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: #334155;
+    }
+
+    body {
+      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Навигация */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.2rem 2rem;
+      background: #020617;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo {
+      font-size: 1.4rem;
+      font-weight: bold;
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    nav a {
+      color: var(--text);
+      text-decoration: none;
+      margin-left: 1.2rem;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    nav a:hover {
+      color: var(--accent);
+    }
+
+    nav a.active {
+      background: var(--accent);
+      color: #000;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      font-weight: 600;
+    }
+
+    /* Контейнер */
+    .container {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+
+    .page-title {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .page-title h1 {
+      margin: 0;
+      font-size: 2rem;
+      color: var(--text);
+    }
+
+    .page-title p {
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+    }
+
+    /* Основна Карта */
+    .card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 2rem;
+      border: 1px solid var(--border);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Превключвател Бруто / Чисто */
+    .calc-type-selector {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      background: #020617;
+      padding: 0.4rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+
+    .type-btn {
+      flex: 1;
+      padding: 0.7rem;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+
+    .type-btn.active {
+      background: var(--accent);
+      color: #020617;
+    }
+
+    /* Полета за въвеждане */
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    label {
+      display: block;
+      font-size: 0.95rem;
+      margin-bottom: 0.5rem;
+      color: var(--text-muted);
+    }
+
+    .input-wrapper {
+      position: relative;
+    }
+
+    input[type="number"] {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      background: #020617;
+      border: 1px solid var(--border);
+      color: white;
+      font-size: 1.2rem;
+      border-radius: 8px;
+      box-sizing: border-box;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input[type="number"]:focus {
+      border-color: var(--accent);
+    }
+
+    .currency-tag {
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-weight: bold;
+    }
+
+    /* Резултати Таблица */
+    .results-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1.5rem;
+    }
+
+    .results-table tr {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .results-table td {
+      padding: 0.8rem 0;
+      font-size: 1rem;
+    }
+
+    .results-table td:last-child {
+      text-align: right;
+      font-weight: bold;
+    }
+
+    .row-highlight {
+      background: #064e3b;
+      font-size: 1.2rem !important;
+    }
+
+    .row-highlight td {
+      padding: 1rem !important;
+      color: #34d399;
+    }
+
+    /* Монетизация & Рекламни Блокове */
+    .ad-banner {
+      background: #020617;
+      border: 1px dashed var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+      text-align: center;
+      margin: 1.5rem 0;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
+    .affiliate-box {
+      background: linear-gradient(135deg, #1e1b4b, #312e81);
+      border: 1px solid #6366f1;
+      border-radius: 10px;
+      padding: 1.2rem;
+      margin-top: 2rem;
+      text-align: center;
+    }
+
+    .affiliate-box h3 {
+      margin-top: 0;
+      color: #a5b4fc;
+    }
+
+    .affiliate-btn {
+      display: inline-block;
+      background: #4f46e5;
+      color: white;
+      text-decoration: none;
+      padding: 0.7rem 1.5rem;
+      border-radius: 6px;
+      font-weight: bold;
+      margin-top: 0.8rem;
+      transition: background 0.2s;
+    }
+
+    .affiliate-btn:hover {
+      background: #4338ca;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <a href="index.html" class="logo">BGПерли & Финанси 🌲</a>
+    <nav>
+      <a href="index.html">Дестинации</a>
+      <a href="salary.html" class="active">Калкулатор Заплата</a>
+    </nav>
+  </header>
+
+  <div class="container">
+    <div class="page-title">
+      <h1>Калкулатор Заплата (Чисто / Бруто)</h1>
+      <p>Изчислете бързо и точно вашите чисти доходи, удръжки и осигуровки.</p>
+    </div>
+
+    <!-- Място за Google AdSense горе -->
+    <div class="ad-banner">
+      [ Рекламен блок - Google AdSense ]
+    </div>
+
+    <div class="card">
+      <!-- Превключвател за изчисление -->
+      <div class="calc-type-selector">
+        <button class="type-btn active" id="btnGrossToNet" onclick="setMode('grossToNet')">От Бруто към Чисто</button>
+        <button class="type-btn" id="btnNetToGross" onclick="setMode('netToGross')">От Чисто към Бруто</button>
+      </div>
+
+      <!-- Вход за заплата -->
+      <div class="form-group">
+        <label id="inputLabel">Брутна заплата:</label>
+        <div class="input-wrapper">
+          <input type="number" id="salaryAmount" value="2000" placeholder="0.00" oninput="calculateSalary()">
+          <span class="currency-tag">лв.</span>
+        </div>
+      </div>
+
+      <!-- Таблица с удръжки -->
+      <table class="results-table">
+        <tr>
+          <td>Брутна сума</td>
+          <td id="resGross">0.00 лв.</td>
+        </tr>
+        <tr>
+          <td>Лични осигуровки (13.78%)</td>
+          <td id="resInsurances" style="color: #f87171;">-0.00 лв.</td>
+        </tr>
+        <tr>
+          <td>Данък общ доход (10%)</td>
+          <td id="resTax" style="color: #f87171;">-0.00 лв.</td>
+        </tr>
+        <tr class="row-highlight">
+          <td><strong>Чиста сума за получаване (Нето)</strong></td>
+          <td id="resNet"><strong>0.00 лв.</strong></td>
+        </tr>
+        <tr>
+          <td>Разход за работодателя (общо)</td>
+          <td id="resEmployerTotal" style="color: #94a3b8;">0.00 лв.</td>
+        </tr>
+      </table>
+
+      <!-- Афилиейт блок за финанси / кредити -->
+      <div class="affiliate-box">
+        <h3>Планирате покупка или пътуване?</h3>
+        <p style="font-size: 0.9rem; color: #c7d2fe;">Сравнете офертите за потребителски кредити с най-ниски лихви от водещите банки.</p>
+        <a href="https://www.example.com" target="_blank" class="affiliate-btn">Виж оферти за кредити →</a>
+      </div>
+
+    </div>
+
+    <!-- Място за Google AdSense долу -->
+    <div class="ad-banner">
+      [ Рекламен блок - Google AdSense ]
+    </div>
+  </div>
+
+  <script>
+    let currentMode = 'grossToNet'; // 'grossToNet' или 'netToGross'
+
+    // Константи за осигуровки в България
+    const MAX_INSURABLE_INCOME = 3750; // Максимален осигурителен доход
+    const EMPLOYEE_INSURANCE_RATE = 0.1378; // 13.78% осигуровки за работника
+    const EMPLOYER_INSURANCE_RATE = 0.1892; // ~18.92% осигуровки за работодателя
+    const INCOME_TAX_RATE = 0.10; // 10% Данък Общ Доход
+
+    function setMode(mode) {
+      currentMode = mode;
+      
+      const btnGross = document.getElementById('btnGrossToNet');
+      const btnNet = document.getElementById('btnNetToGross');
+      const label = document.getElementById('inputLabel');
+
+      if (mode === 'grossToNet') {
+        btnGross.classList.add('active');
+        btnNet.classList.remove('active');
+        label.innerText = 'Брутна заплата:';
+      } else {
+        btnNet.classList.add('active');
+        btnGross.classList.remove('active');
+        label.innerText = 'Чиста сума (Нето):';
+      }
+
+      calculateSalary();
+    }
+
+    function calculateSalary() {
+      const inputVal = parseFloat(document.getElementById('salaryAmount').value) || 0;
+      
+      let gross = 0;
+      let net = 0;
+      let employeeInsurance = 0;
+      let tax = 0;
+      let employerTotal = 0;
+
+      if (currentMode === 'grossToNet') {
+        gross = inputVal;
+        
+        // Изчисление на осигуровки за работника (до максималния праг)
+        const insurableBase = Math.min(gross, MAX_INSURABLE_INCOME);
+        employeeInsurance = insurableBase * EMPLOYEE_INSURANCE_RATE;
+
+        // Данъчна основа = Бруто - Лични осигуровки
+        const taxableBase = gross - employeeInsurance;
+        tax = Math.max(0, taxableBase * INCOME_TAX_RATE);
+
+        // Чиста заплата
+        net = gross - employeeInsurance - tax;
+
+      } else { // netToGross
+        net = inputVal;
+
+        // Обратно изчисление на брутната заплата от чистата
+        // Формула: Net = Gross - Insurances - Tax
+        // За суми под максималния осигурителен доход:
+        const netRate = (1 - EMPLOYEE_INSURANCE_RATE) * (1 - INCOME_TAX_RATE) + EMPLOYEE_INSURANCE_RATE * INCOME_TAX_RATE;
+        gross = net / netRate;
+
+        // Ако надхвърля максималния осигурителен доход, правим точна коригирана сметка:
+        const insurableBaseTest = Math.min(gross, MAX_INSURABLE_INCOME);
+        const testInsurance = insurableBaseTest * EMPLOYEE_INSURANCE_RATE;
+        if (gross > MAX_INSURABLE_INCOME) {
+          gross = (net - (testInsurance * INCOME_TAX_RATE) + (MAX_INSURABLE_INCOME * EMPLOYEE_INSURANCE_RATE * INCOME_TAX_RATE)) / (1 - INCOME_TAX_RATE);
+        }
+
+        const insurableBase = Math.min(gross, MAX_INSURABLE_INCOME);
+        employeeInsurance = insurableBase * EMPLOYEE_INSURANCE_RATE;
+        const taxableBase = gross - employeeInsurance;
+        tax = Math.max(0, taxableBase * INCOME_TAX_RATE);
+      }
+
+      // Общ разход за работодателя
+      const employerInsurances = Math.min(gross, MAX_INSURABLE_INCOME) * EMPLOYER_INSURANCE_RATE;
+      employerTotal = gross + employerInsurances;
+
+      // Обновяване на интерфейса
+      document.getElementById('resGross').innerText = gross.toFixed(2) + ' лв.';
+      document.getElementById('resInsurances').innerText = '- ' + employeeInsurance.toFixed(2) + ' лв.';
+      document.getElementById('resTax').innerText = '- ' + tax.toFixed(2) + ' лв.';
+      document.getElementById('resNet').innerHTML = '<strong>' + net.toFixed(2) + ' лв.</strong>';
+      document.getElementById('resEmployerTotal').innerText = employerTotal.toFixed(2) + ' лв.';
+    }
+
+    // Първоначално изчисление при зареждане
+    calculateSalary();
+  </script>
+</body>
+</html>
